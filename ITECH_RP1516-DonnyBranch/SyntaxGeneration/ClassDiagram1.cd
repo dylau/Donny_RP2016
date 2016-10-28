@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="RP2k1516.Agent.KGRSurface">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAAAAgAAAAkgAAAAAAAIAgAIAIABAAAkAARAAAAIE=</HashCode>
+      <FileName>Agent\KGRSurface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RP2k1516.Agent.PinAgent">
+    <Position X="3.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAgBAAAIAAAAgEAAAAAAAAAAAAAAAAAAAAgAEAAA=</HashCode>
+      <FileName>Agent\PinAgent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RP2k1516.Agent.PinFlock">
+    <Position X="5.25" Y="1.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAIACgAAAAwAAAAQgQAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Agent\PinFlock.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RP2k1516.Agent.GhcPinAgent">
+    <Position X="1" Y="1.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIABAAAAAAAAAAAABAAAgEAABAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Agent\GhcPinAgent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RP2k1516.Agent.GhcFiberAgent">
+    <Position X="10.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIABAAAAAAAAAAAAAAAAAGAABABAAAAAAAAABEAAAE=</HashCode>
+      <FileName>Agent\GhcFiberAgent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RP2k1516.Agent.StaticPins">
+    <Position X="12.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Agent\StaticPins.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RP2k1516.Frame">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAgAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Basics\Frame.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Microsoft JhengHei UI" Size="9" />
+</ClassDiagram>
