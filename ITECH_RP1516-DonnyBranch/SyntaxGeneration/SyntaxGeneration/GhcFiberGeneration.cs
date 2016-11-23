@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using RP2k1516;
-
 
 namespace RP1516
 {
     public class GhcGeodesic : GH_Component
     {
-
         public GhcGeodesic()
           : base("FiberGeneration", "FiberGeneration",
               "FiberGeneration",
@@ -34,7 +31,6 @@ namespace RP1516
         {
             pManager.AddGenericParameter("All Fibers", "All Fibers", "All Fibers", GH_ParamAccess.list);
             pManager.AddCurveParameter("All Fiber Curves", "All Fiber Curves", "All Fiber Curves", GH_ParamAccess.list);
-
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -46,8 +42,8 @@ namespace RP1516
             Curve CrvB = null;
             DA.GetData<Curve>("Frame A", ref CrvA);
             DA.GetData<Curve>("Frame B", ref CrvB);
-            CrvA.Rebuild(50, 3, true);
-            CrvB.Rebuild(50, 3, true);
+            //CrvA.Rebuild(50, 3, true);
+            //CrvB.Rebuild(50, 3, true);
             List<Point3d> pointsA = new List<Point3d>();
             List<Point3d> pointsB = new List<Point3d>();
             DA.GetDataList<Point3d>("Pins on Frame A", pointsA);
@@ -72,20 +68,9 @@ namespace RP1516
             List<Pin> PinsA = new List<Pin>();
             List<Pin> PinsB = new List<Pin>();
 
-            /*
-            for (int i = 0; i < (Int16)PinCountA; i++)
-            {
-                Pin iPin = new Pin(pointsA[i], CrvA, "A", i);
-                PinsA.Add(iPin);
-            }
-
-            for (int i = 0; i < (Int16)PinCountB; i++)
-            {
-                Pin iPin = new Pin(pointsB[i], CrvB, "B", i);
-                PinsB.Add(iPin);
-            }
-            */
             
+            
+
             // insdanciate the pins with neighbour definition 
             for (int i = 0; i <= (Int16)neighbourRange; i++)  
             {
@@ -140,10 +125,6 @@ namespace RP1516
             List<Curve> AllFiberCurves = new List<Curve>();
             AllFiberCurves = AllPossibleFibers.Select(o => o.FiberCrv).ToList();
             DA.SetDataList("All Fiber Curves", AllFiberCurves);
-
-            
-
-
 
         }
 

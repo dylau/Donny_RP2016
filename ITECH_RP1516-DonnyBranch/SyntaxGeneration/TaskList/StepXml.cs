@@ -178,7 +178,6 @@ namespace RP1516
             stepNode.AppendChild(Node_14.WriteTaskNode());
 
             // writing and namming the xml file
-            //XmlWriter write = XmlWriter.Create(string.Format("C:\\Users\\dyliu\\desktop\\TaskList\\TaskList_{0}.xml", Step3Digit), Settings);
             XmlWriter write = XmlWriter.Create(string.Format("{0}\\TaskList_{1}.xml", path, Step4Digit), Settings);
 
             xmlDoc.Save(write);

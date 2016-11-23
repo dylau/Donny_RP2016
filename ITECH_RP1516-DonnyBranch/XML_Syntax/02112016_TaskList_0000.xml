@@ -1,0 +1,17 @@
+﻿<Step id="0000" pinStart="B25" pinEnd="A10" wind_pin="W_10">
+	<Task id="0" agent="Drone" command="BA" />
+	<Task id="1" agent="Effectors" command="GAOPEN" />
+	<Task id="2" agent="RobotA" command="50" />
+	<Task id="3" agent="Effectors" command="GACLOSE" />
+	<Task id="4" agent="Drone" command="MOFF" />
+	<Task id="5" agent="Effectors" command="TON" />
+	<Task id="6" agent="RobotA" command="61" />
+	<Task id="7" agent="RobotA" command="70" />
+	<Task id="8" agent="RobotA" command="90" />
+	<Task id="9" agent="RobotA" command="80" />
+	<Task id="10" agent="RobotA" command="51" />
+	<Task id="11" agent="Drone" command="MON" />
+	<Task id="12" agent="Effectors" command="TOFF" />
+	<Task id="13" agent="Effectors" command="GAOPEN" />
+	<Task id="14" agent="RobotA" command="60" />
+</Step>

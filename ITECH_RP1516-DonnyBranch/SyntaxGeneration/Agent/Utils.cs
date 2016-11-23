@@ -7,7 +7,6 @@ using Rhino.Geometry;
 using Rhino.Geometry.Intersect;
 
 
-
 namespace RP1516
 {
     static class Utils // i.e. Utilities
@@ -105,64 +104,61 @@ namespace RP1516
             List<Fiber> fibers = new List<Fiber>();
             List<Curve> fiberCrvs = new List<Curve>();
 
+
             for (int i = 0; i < pinsA.Count; i++) //A
             {
                 for (int j = 0; j < pinsB.Count; j++) //B
                 {
-                    if (fiberGenerationType == "Intersaction")
-                    {
-                        // intersection
-                        Curve[] IntersactionCrv = IntersectionCrv(srf, pinsA[i].Position, pinsB[j].Position); // out IntersectionCrvResult
-                        Curve fiberCrv = null;
-                        if (IntersactionCrv == null || IntersactionCrv.Length == 0)
-                            break;
-                        else
-                            fiberCrv = IntersactionCrv.Where(o => o != null).ToList().First();
+                    #region Intersaction
+                    //if (fiberGenerationType == "Intersaction")
+                    //{
+                    //    // intersection
+                    //    Curve[] IntersactionCrv = IntersectionCrv(srf, pinsA[i].Position, pinsB[j].Position); // out IntersectionCrvResult
+                    //    Curve fiberCrv = null;
+                    //    if (IntersactionCrv == null || IntersactionCrv.Length == 0)
+                    //        break;
+                    //    else
+                    //        fiberCrv = IntersactionCrv.Where(o => o != null).ToList().First();
 
-                        if ((fiberCrv.PointAtStart.DistanceTo(pinsA[i].Position) < 0.01 && fiberCrv.PointAtEnd.DistanceTo(pinsB[j].Position) < 0.01)) 
-                        {
-                            fiberCrvs.Add(fiberCrv);
+                    //    if ((fiberCrv.PointAtStart.DistanceTo(pinsA[i].Position) < 0.01 && fiberCrv.PointAtEnd.DistanceTo(pinsB[j].Position) < 0.01)) 
+                    //    {
+                    //        fiberCrvs.Add(fiberCrv);
 
-                            Fiber ifiber = new Fiber(fiberCrv, -1, "AB", "MAT");
-                            ifiber.StartPinID = pinsA[i].PinID;
-                            ifiber.EndPinID = pinsB[j].PinID; // always starts from A to B
-                            ifiber.PinA = pinsA[i];
-                            ifiber.PinB = pinsB[j];
-                            //ifiber.StartPin = pinsA[i];
-                            //ifiber.EndPin = pinsB[i];
+                    //        Fiber ifiber = new Fiber(fiberCrv, -1, "AB");
+                    //        ifiber.StartPinID = pinsA[i].PinID;
+                    //        ifiber.EndPinID = pinsB[j].PinID; // always starts from A to B
+                    //        ifiber.PinA = pinsA[i];
+                    //        ifiber.PinB = pinsB[j];
+                    //        //ifiber.StartPin = pinsA[i];
+                    //        //ifiber.EndPin = pinsB[i];
 
-                            pinsA[i].VisibleFibers.Add(ifiber);
-                            pinsB[j].VisibleFibers.Add(ifiber);
+                    //        pinsA[i].VisibleFibers.Add(ifiber);
+                    //        pinsB[j].VisibleFibers.Add(ifiber);
 
-                            fibers.Add(ifiber);
-                        }
-                            // (fiberCrv.PointAtStart.DistanceTo(pinsB[j].Position) < 0.01 && fiberCrv.PointAtEnd.DistanceTo(pinsA[i].Position) < 0.01))
-                        //{
-                            
-                       // }
-                        //else
-                          //  break;
-                    }
+                    //        fibers.Add(ifiber);
+                    //    }
+                    // (fiberCrv.PointAtStart.DistanceTo(pinsB[j].Position) < 0.01 && fiberCrv.PointAtEnd.DistanceTo(pinsA[i].Position) < 0.01))
+                    //{
 
-                    if (fiberGenerationType == "Geodesic") // geodesic
-                    {
-                        Curve fiberCrv = GeodesicLine(srf, pinsA[i].Position, pinsB[j].Position);
-                        fiberCrvs.Add(fiberCrv);
+                    // }
+                    //else
+                    //  break;
+                    //}
+                    #endregion
 
-                        Fiber ifiber = new Fiber(fiberCrv, -1, "AB", "MAT");
-                        ifiber.StartPinID = pinsA[i].PinID;
-                        ifiber.EndPinID = pinsB[j].PinID; // always starts from A to B
-                        ifiber.PinA = pinsA[i];
-                        ifiber.PinB = pinsB[j];
+                    Curve fiberCrv = GeodesicLine(srf, pinsA[i].Position, pinsB[j].Position);
+                    fiberCrvs.Add(fiberCrv);
 
-                        pinsA[i].VisibleFibers.Add(ifiber);
-                        pinsB[j].VisibleFibers.Add(ifiber);
+                    Fiber ifiber = new Fiber(fiberCrv, -1, "AB");
+                    ifiber.StartPinID = pinsA[i].PinID;
+                    ifiber.EndPinID = pinsB[j].PinID; // always starts from A to B
+                    ifiber.PinA = pinsA[i];
+                    ifiber.PinB = pinsB[j];
 
-                        fibers.Add(ifiber);
-                    }
+                    pinsA[i].VisibleFibers.Add(ifiber);
+                    pinsB[j].VisibleFibers.Add(ifiber);
 
-                    
-                        
+                    fibers.Add(ifiber);
                 }
             }
 
@@ -242,43 +238,43 @@ namespace RP1516
         {
             
             List<Point3d> Pts = new List<Point3d>();
-            List<double> tt = new List<double>();
-
-            tt = crv.DivideByLength(0.1, true).ToList();
-            foreach(double t in tt)
+            for(int i = 0; i < count; i++)
             {
-                Pts.Add(crv.PointAt(t));
-
+                double pointat = (double)i / (double)count;
+                Pts.Add(crv.PointAt(pointat));
             }
+            
+            //List<double> tt = new List<double>();
+            //tt = crv.DivideByLength(0.1, true).ToList();
+
+            //foreach (double t in tt)
+            //{
+            //    Pts.Add(crv.PointAt(t));
+
+            //}
 
             return Pts;
         }
 
-        static public List<Point3d> PublicatePointsOnCurve(Curve crv, double len) // by length
-        {
-            List<Point3d> Pts = new List<Point3d>();
-            List<double> tt = new List<double>();
+        //static public List<Point3d> PublicatePointsOnCurve(Curve crv, double len) // by length
+        //{
+        //    List<Point3d> Pts = new List<Point3d>();
+        //    List<double> tt = new List<double>();
 
-            tt = crv.DivideByLength(len, true).ToList();
+        //    tt = crv.DivideByLength(len, true).ToList();
 
-            tt = crv.DivideByLength(0.1, true).ToList();
-            foreach (double t in tt)
-            {
-                Pts.Add(crv.PointAt(t));
+        //    tt = crv.DivideByLength(0.1, true).ToList();
+        //    foreach (double t in tt)
+        //    {
+        //        Pts.Add(crv.PointAt(t));
 
-            }
+        //    }
 
-            return Pts;
+        //    return Pts;
 
-        }
+        //}
 
-        static public string DigitControl(int targetDigit, int originInteger)
-        {
-            string theString = null;
 
-            return theString;
-
-        }
        
 
     }

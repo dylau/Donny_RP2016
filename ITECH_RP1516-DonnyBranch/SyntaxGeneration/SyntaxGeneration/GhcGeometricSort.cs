@@ -8,7 +8,6 @@ namespace RP1516
 {
     public class GhcGeometricSort : GH_Component
     {
-
         public GhcGeometricSort()
           : base("GeometricSort", "GeometricSort",
               "GeometricSort",
@@ -24,7 +23,6 @@ namespace RP1516
             pManager.AddNumberParameter("Sag Fiber Density", "Sag Fiber Density", "Sag Fiber Density", GH_ParamAccess.item, 0.1); // a double between 0 and 1
             pManager.AddNumberParameter("Curliness Threshold", "Curliness Threshold", "Curliness Threshold", GH_ParamAccess.item, 0.5);
             //pManager.AddGenericParameter("Structure Input", "Structure Input", "A list of SoFiNode objects", GH_ParamAccess.list);
-
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -32,17 +30,13 @@ namespace RP1516
             pManager.AddCurveParameter("Sorted Fiber Curves", "Sorted Fiber Curves", "Sorted Fiber Curves", GH_ParamAccess.list); // all sorted fiber crvs
             pManager.AddGenericParameter("Sorted Custom Fibers", "Sorted Custom Fibers", "Sorted Custom Fibers", GH_ParamAccess.list); // for XML
             pManager.AddNumberParameter("Sorting Key Values", "Sorting Key Values", "Sorting Key Values", GH_ParamAccess.list);
-
             pManager.AddCurveParameter("N", "N", "Negative", GH_ParamAccess.list);
             pManager.AddCurveParameter("P", "P", "Positive", GH_ParamAccess.list);
             pManager.AddCurveParameter("NC", "NC", "Nega Curly", GH_ParamAccess.list);
             pManager.AddCurveParameter("PC", "PC", "Posi Curly", GH_ParamAccess.list);
             pManager.AddCurveParameter("NS", "NS", "Nega Straight", GH_ParamAccess.list);
             pManager.AddCurveParameter("PS", "PS", "Posi Straight", GH_ParamAccess.list);
-
             pManager.AddGenericParameter("Skipped", "Skipped", "Skipped", GH_ParamAccess.list);
-            //pManager.AddNumberParameter("Info", "Skipped", "Skipped", GH_ParamAccess.list);
-
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -133,7 +127,6 @@ namespace RP1516
             List<double> SortingKeyValues = new List<double>();
             List<string> FiberTypes = new List<string>();
 
-
             #region: Relative height
             /*
             if (SortingFactor == "Relative Height")
@@ -175,21 +168,21 @@ namespace RP1516
 
             #endregion
             #region: Pin position
-            if (SortingFactor == "Pin position")
-            {
-                // calculate the sorting key value
-                AllPossibleFibers.ForEach(o => o.CalculatePinPotential());
-                // sorting
-                SortedFibers = AllPossibleFibers.OrderByDescending(o => o.PinPotential).ToList();
+            //if (SortingFactor == "Pin position")
+            //{
+            //    // calculate the sorting key value
+            //    AllPossibleFibers.ForEach(o => o.CalculatePinPotential());
+            //    // sorting
+            //    SortedFibers = AllPossibleFibers.OrderByDescending(o => o.PinPotential).ToList();
 
-                for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
-                {
-                    SortedFibers[i].FiberSortingIndex = i;
-                }
+            //    for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
+            //    {
+            //        SortedFibers[i].FiberSortingIndex = i;
+            //    }
 
-                SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
-                SortingKeyValues = SortedFibers.Select(o => o.PinPotential).ToList();
-            }
+            //    SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
+            //    SortingKeyValues = SortedFibers.Select(o => o.PinPotential).ToList();
+            //}
             #endregion
             #region: Potential
             /*
@@ -238,58 +231,58 @@ namespace RP1516
             */
             #endregion
             #region: +-Curvature
-            if (SortingFactor == "+-Curvature") // determine chain and nonchain, sorted by verticle distances.
-            {
+            //if (SortingFactor == "+-Curvature") // determine chain and nonchain, sorted by verticle distances.
+            //{
 
-                // compute SagThreshold
-                double maxDistanceMax = NegativeFibers.Select(o => o.Curliness).Max();
-                double minDistanceMin = NegativeFibers.Select(o => o.Curliness).Min();
-                double SagThreshold = minDistanceMin + (maxDistanceMax - minDistanceMin) * sagThreshold;
+            //    // compute SagThreshold
+            //    double maxDistanceMax = NegativeFibers.Select(o => o.Curliness).Max();
+            //    double minDistanceMin = NegativeFibers.Select(o => o.Curliness).Min();
+            //    double SagThreshold = minDistanceMin + (maxDistanceMax - minDistanceMin) * sagThreshold;
 
-                List<Fiber> ChainFibers = new List<Fiber>();
-                List<Fiber> NonChainfibers = new List<Fiber>();
-                List<Fiber> SortedChains = new List<Fiber>();
-                List<Fiber> SortedNonChains = new List<Fiber>();
-                List<Line> FiberStraightLines = new List<Line>();
+            //    List<Fiber> ChainFibers = new List<Fiber>();
+            //    List<Fiber> NonChainfibers = new List<Fiber>();
+            //    List<Fiber> SortedChains = new List<Fiber>();
+            //    List<Fiber> SortedNonChains = new List<Fiber>();
+            //    List<Line> FiberStraightLines = new List<Line>();
 
-                AllPossibleFibers.ForEach(o => o.DetermineChain());
+            //    AllPossibleFibers.ForEach(o => o.DetermineChain());
 
-                foreach (Fiber ifiber in AllPossibleFibers) // grouping chains and nonchains
-                {
-                    if (ifiber.Type == "Chain")
-                        ChainFibers.Add(ifiber);
-                    else
-                    {
-                        NonChainfibers.Add(ifiber);
-                    }
-                }
+            //    foreach (Fiber ifiber in AllPossibleFibers) // grouping chains and nonchains
+            //    {
+            //        if (ifiber.Type == "Chain")
+            //            ChainFibers.Add(ifiber);
+            //        else
+            //        {
+            //            NonChainfibers.Add(ifiber);
+            //        }
+            //    }
 
-                SortedChains = ChainFibers.OrderByDescending(o => o.MaximumDistance).ToList(); // sorting chains: max -> min
+            //    SortedChains = ChainFibers.OrderByDescending(o => o.MaximumDistance).ToList(); // sorting chains: max -> min
 
-                if (sagThreshold > 0)
-                {
-                    SortedChains.Select(o => o.MaximumDistance > SagThreshold);
-                    //List<Fiber> SkippedFibers = new List<Fiber>();
+            //    if (sagThreshold > 0)
+            //    {
+            //        SortedChains.Select(o => o.MaximumDistance > SagThreshold);
+            //        //List<Fiber> SkippedFibers = new List<Fiber>();
 
-                }
+            //    }
                     
-                SortedChains.RemoveAll(o => o.MaximumDistance > SagThreshold); // remove top-top fibers, threshold default = 0.1m
+            //    SortedChains.RemoveAll(o => o.MaximumDistance > SagThreshold); // remove top-top fibers, threshold default = 0.1m
 
-                SortedNonChains = NonChainfibers.OrderByDescending(o => o.PinPotential).ToList(); // sorting nonchains: min -> max
+            //    SortedNonChains = NonChainfibers.OrderByDescending(o => o.PinPotential).ToList(); // sorting nonchains: min -> max
 
-                SortedFibers = SortedChains.Concat(SortedNonChains).ToList(); // merging into a big fiber list
+            //    SortedFibers = SortedChains.Concat(SortedNonChains).ToList(); // merging into a big fiber list
 
-                for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
-                {
-                    SortedFibers[i].FiberSortingIndex = i;
-                }
+            //    for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
+            //    {
+            //        SortedFibers[i].FiberSortingIndex = i;
+            //    }
 
-                SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
-                SortingKeyValues = SortedFibers.Select(o => (double)o.FiberSortingIndex).ToList();
-                FiberStraightLines = SortedFibers.Select(o => o.StraightLine).ToList();
-                FiberTypes = SortedFibers.Select(o => o.Type).ToList();
+            //    SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
+            //    SortingKeyValues = SortedFibers.Select(o => (double)o.FiberSortingIndex).ToList();
+            //    FiberStraightLines = SortedFibers.Select(o => o.StraightLine).ToList();
+            //    FiberTypes = SortedFibers.Select(o => o.Type).ToList();
 
-            }
+            //}
             #endregion 
 
             #region: Curliness
@@ -313,8 +306,6 @@ namespace RP1516
                     .Concat(PosiCurly)
                     .ToList();
 
-                
-
                 for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
                 {
                     SortedFibers[i].FiberSortingIndex = i;
@@ -330,17 +321,14 @@ namespace RP1516
             DA.SetDataList("Sorted Custom Fibers", SortedFibers);
             DA.SetDataList("Sorted Fiber Curves", SortedFiberCrvs);
             DA.SetDataList("Sorting Key Values", SortingKeyValues);
-
             DA.SetDataList("N", NegativeFibers.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("P", PositiveFibers.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("NC", NegaCurly.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("PC", PosiCurly.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("NS", NegaStraight.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("PS", PosiStraight.Select(o => o.FiberCrv).ToList());
-
             DA.SetDataList("Skipped", SkippedFibers.Select(o => o.FiberCrv).ToList());
             //DA.SetDataList("Info", info);
-
             //DA.GetDataList<SoFiNode>("Structure Input", SoFiNodes);
         }
 
