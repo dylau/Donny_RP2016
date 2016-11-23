@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,11 +6,11 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using RP2k1516;
 
-    
+
 namespace RP1516
 {
     public class GhcPathSelection : GH_Component
-    {   
+    {
         public GhcPathSelection()
           : base("PathSelection", "PathSelection",
               "PathSelection",
@@ -37,10 +37,10 @@ namespace RP1516
             pManager.AddTextParameter("Syntax Note", "Syntax Note", "Syntax Note", GH_ParamAccess.list);
             pManager.AddNumberParameter("Fiber Sorting Indexes", "Fiber Sorting Indexes", "Fiber Sorting Indexes", GH_ParamAccess.list);
         }
- 
+
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<Fiber> SortedFibersBigList = new List<Fiber>(); 
+            List<Fiber> SortedFibersBigList = new List<Fiber>();
             DA.GetDataList<Fiber>("Sorted Custom Fibers", SortedFibersBigList);
             //double tolerance = 0.0; 
             //DA.GetData<double>("Order Tolerance", ref tolerance);
@@ -67,7 +67,7 @@ namespace RP1516
             }
 
             else
-            {   
+            {
                 SortedFibers = SortedFibersBigList;
             }
 
@@ -77,7 +77,7 @@ namespace RP1516
             // component output
             List<Fiber> FiberSyntax = new List<Fiber>();
             List<string> PinIDsNote = new List<string>();
-            
+
             // initialize
             PathAgent PathAgent = new PathAgent(SortedFibers[0].PinA, SortedFibers[0], SortedFibers, RemoveEdge, pinCapacity); // the first pin is pinA of the first fiber on the list 
             FiberSyntax.Add(SortedFibers[0]);
@@ -92,12 +92,12 @@ namespace RP1516
             SortedFibers[0].PinB.ConnectedPins.Add(SortedFibers[0].PinA);
 
             // mark down first fab index
-            PathAgent.FiberFabricationIndexNote.Add(SortedFibers[0].FiberSortingIndex); 
+            PathAgent.FiberFabricationIndexNote.Add(SortedFibers[0].FiberSortingIndex);
 
             // Loop of searching fibers begin
             for (int i = 0; i < SortedFibers.Count; i++)
             {
-                
+
                 PathAgent.GoToTheOtherPin(); // currentPin is changed according to current fiber
                 PathAgent.MarkDownCurrentPin();
                 // updated fiber
@@ -132,7 +132,7 @@ namespace RP1516
                 // evaluate
                 //if (PathAgent.CurrentFiber.FiberSortingIndex - i > 0) // && intersect with each other
                 //    PathAgent.SyntaxEvaluation += PathAgent.CurrentFiber.FiberSortingIndex - i;
-                               
+
             }
             List<Curve> ContinousFiberCrv = new List<Curve>();
             ContinousFiberCrv = FiberSyntax.Select(o => o.FiberCrv).ToList();

@@ -34,9 +34,6 @@ namespace RP1516
             pManager.AddGenericParameter("Custom Fibers", "Custom Fibers", "Custom Fibers", GH_ParamAccess.list);
             pManager.AddSurfaceParameter("Surface", "Surface", "Surface", GH_ParamAccess.item);
 
-            //pManager.AddMeshParameter("Mesh", "Mesh", "Mesh", GH_ParamAccess.item);
-            //pManager.AddGenericParameter("Fiber Big List", "Fiber Big List", "Fiber Big List", GH_ParamAccess.list);
-
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -47,8 +44,6 @@ namespace RP1516
             pManager.AddNumberParameter("Info Number", "Info Number", "Info Number", GH_ParamAccess.list);
             pManager.AddCurveParameter("Criticle Fibers", "Criticle Fibers", "Criticle Fibers", GH_ParamAccess.list);
             pManager.AddNumberParameter("Value", "Value", "Value", GH_ParamAccess.list);
-            //pManager.AddGenericParameter("Fibers to Present", "Fibers to Present", "Fibers to Present", GH_ParamAccess.list);
-            //pManager.AddGenericParameter("Fiber Info", "Fiber Info", "Fiber Info", GH_ParamAccess.item); 
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -102,7 +97,6 @@ namespace RP1516
 
             // ====================== structure info big list ===================================
             // node number, compression stress, tension stress, force in  local x, force in local y 
-
             List<NodalStructureInfo> NodalStructureInfo = new List<NodalStructureInfo>();
             for (int i = 0; i < nodeNum.Count; i++) 
             {
@@ -112,7 +106,6 @@ namespace RP1516
             // ==================================================================================
 
             // abandom the nodes not on the srf
-            // list.RemoveAll(item => !list2.Contains(item))
             List<double> nodeNumOnSrf = SoFiNodesOnSrf.Select(o => o.NodeNum).ToList();
             NodalStructureInfo.RemoveAll(o => !nodeNumOnSrf.Contains(o.NodeNum)); // remove structure info not on srf
             List<NodalStructureInfo> CondensedNodalStructureInfo = new List<RP1516.NodalStructureInfo>();
@@ -151,16 +144,11 @@ namespace RP1516
                 SoFiNodesOnSrf[i].Ny = iNY;
 
             }
-            //List<NodalStructureInfo> CondensedNodalStructureInfo = Utils.CheckDuplicate(NodalStructureInfo);
-
-            // SoFiNode.InfoRead(SoFiNodesOnSrf, CondensedNodalStructureInfo);
-             
             // calculate structure significance
             Fibers.ForEach(o => o.StrutureValue(SoFiNodesOnSrf));
 
             List<Fiber> CriticleFibers = Fibers
                 .OrderByDescending(o => o.StructureFactor)
-                //.Take((int)(Fibers.Count * 0.2))
                 .ToList();
 
             // Output

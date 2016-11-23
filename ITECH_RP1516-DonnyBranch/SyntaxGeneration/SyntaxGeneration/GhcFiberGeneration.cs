@@ -42,8 +42,7 @@ namespace RP1516
             Curve CrvB = null;
             DA.GetData<Curve>("Frame A", ref CrvA);
             DA.GetData<Curve>("Frame B", ref CrvB);
-            //CrvA.Rebuild(50, 3, true);
-            //CrvB.Rebuild(50, 3, true);
+ 
             List<Point3d> pointsA = new List<Point3d>();
             List<Point3d> pointsB = new List<Point3d>();
             DA.GetDataList<Point3d>("Pins on Frame A", pointsA);
@@ -67,9 +66,6 @@ namespace RP1516
             // instantiate Pin
             List<Pin> PinsA = new List<Pin>();
             List<Pin> PinsB = new List<Pin>();
-
-            
-            
 
             // insdanciate the pins with neighbour definition 
             for (int i = 0; i <= (Int16)neighbourRange; i++)  

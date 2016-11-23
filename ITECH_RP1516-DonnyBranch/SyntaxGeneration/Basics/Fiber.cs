@@ -36,17 +36,6 @@ namespace RP1516
         // structure parameter
         public double StructureFactor = 0.0; // bigger factor shows more importance
 
-        #region commented fields
-        //public double LengthDifference; 
-        //public double Potential; 
-        //public double PinPotential; 
-
-        // relative height
-        //public List<Fiber> RelatedFibers = new List<Fiber>(); // the fibers which are higher should be laid first
-        //public List<double> Distances = new List<double>(); // the distances to its related lines
-        //public List<bool> IsHigher = new List<bool>(); // the high/low relations to its related lines
-        #endregion
-
         // instantiation
         public Fiber(Curve fiberCrv, int fiberID, string direction)
         {
@@ -58,27 +47,11 @@ namespace RP1516
             CalculateCurliness(); 
         }
 
-        //public void CalculatePinPotential() // bigger, higher, lay earlier
-        //{
-        //    double pinPotential;
-        //    pinPotential = FiberCrv.PointAtEnd.Z + FiberCrv.PointAtStart.Z;
-        //    PinPotential = pinPotential;
-        //}
-
         public void DetermineType() 
         {
             Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
             StraightLine = straightLine; // generate a straightline
-            
-            //double distance = StraightLine.PointAt(0.5).Z - FiberCrv.PointAt(0.5).Z; 
-            //if (distance < 0)
-            //    Type = "Positive and Both";
-            //else
-            //    Type = "Negative";
-            //MaximumDistance = Math.Abs(distance);
-
-            #region complex way
-
+         
             bool flag = true;
             List<double> distances = new List<double>(); // verticle distance, +- 
 
@@ -109,9 +82,6 @@ namespace RP1516
                 Type = "Negative";
             else
                 Type = "Positive and Both";
-
-            #endregion
-
         }
 
         public void CalculateCurliness()
@@ -147,77 +117,6 @@ namespace RP1516
             }
             PassingSofiNodes.ForEach(o => StructureFactor += Math.Abs(o.StressCom));
         }  // heavy!
-
-           // extra sorting methods
-           /*
-           public void CalculateLengthDifference()
-           {
-               Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
-               double lengthDifference = FiberCrv.GetLength() - straightLine.Length;
-               LengthDifference = lengthDifference;
-           }
-
-           public void CalculatePotential()
-           {
-               double potential = 0.0;
-               double t;
-               for (int i = 0; i < 20; i++)
-               {
-                   t = Convert.ToDouble(i) / Convert.ToDouble(20 - 1);
-                   potential += FiberCrv.PointAt(t).Z;
-               }
-               Potential = potential;
-           }
-           */
-           /*
-           public void FindTuringPtOnCrv()
-           {
-               List<TurningPoint> turningPts = Utils.FindTurningPt(FiberCrv);
-               if (turningPts.Count == 1 && turningPts[0].Type == "max")
-               {
-                   Type = "Arch";
-               }
-
-               if (turningPts.Count == 1 && turningPts[0].Type == "min")
-               {
-                   Type = "Chain";
-               }
-
-               if (turningPts.Count > 1 || turningPts.Count == 0)
-               {
-                   Type = "Doubly";
-               }
-               TurningPts = turningPts;
-
-           } // not working
-           */
-           /*
-           public void DetermineRelativeHeight(Fiber theOtherFiber)
-           {
-               double a, b;
-               bool boo = false;
-               boo  = Intersection.LineLine(this.StraightLine, theOtherFiber.StraightLine, out a, out b);
-               if (boo) // they intersect!
-               {
-                   Point3d intersectPointOnThisLine = new Point3d(this.StraightLine.PointAt(a));
-                   Point3d intersectPointOnTheOtherLine = new Point3d(theOtherFiber.StraightLine.PointAt(b));
-                   double distance = intersectPointOnThisLine.DistanceTo(intersectPointOnTheOtherLine);
-                   // collect info for this fiber
-                   RelatedFibers.Add(theOtherFiber);
-                   Distances.Add(distance);
-                   IsHigher.Add(intersectPointOnThisLine.Z > intersectPointOnTheOtherLine.Z);
-                   // collect info for the other fiber
-                   theOtherFiber.RelatedFibers.Add(this);
-                   theOtherFiber.Distances.Add(distance);
-                   theOtherFiber.IsHigher.Add(intersectPointOnThisLine.Z < intersectPointOnTheOtherLine.Z);
-               }
-
-           }
-           */
-
-
-
-
     }
 
 }

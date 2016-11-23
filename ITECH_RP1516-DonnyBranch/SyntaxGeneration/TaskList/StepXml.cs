@@ -146,13 +146,6 @@ namespace RP1516
             TaskNode Node_8 = new TaskNode("8", string.Format("Robot{0}", OperationSide), "90", xmlDoc);
             stepNode.AppendChild(Node_7.WriteTaskNode());
 
-            /*
-            TaskNode robotNode_7 = new TaskNode("7", string.Format("Robot{0}", StepCurve.EndPinID[0]), string.Format("W_{0}", StepCurve.PinB.Index.ToString()), xmlDoc);
-            if (StepCurve.Direction == "BA")
-                robotNode_7.Command = string.Format("W_{0}", StepCurve.PinA.Index.ToString());
-            stepNode.AppendChild(robotNode_7.WriteTaskNode());
-            */
-
             // Robot: travel back
             TaskNode Node_9 = new TaskNode("9", string.Format("Robot{0}", OperationSide), "80", xmlDoc);
             stepNode.AppendChild(Node_9.WriteTaskNode());

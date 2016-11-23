@@ -28,7 +28,6 @@ namespace RP1516
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            //pManager.AddTextParameter("Info", "Info", "Info", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

@@ -16,11 +16,9 @@ namespace RP1516
         public Curve FrameCrv;
         public List<Fiber> VisibleFibers; // potential fibers start with this pin
         public Point3d Position;
-        //public Plane WindingPlane; // new!!
         public List<Pin> ConnectedPins; // connected with fiebrs
         public List<int> ConnectedPinsCount;
         public List<Pin> NeighbourPins; // on the same frame, defined by neighbour range
-
 
         public Pin(Point3d position, Curve frameCrv, string frameID, int index)
         {
