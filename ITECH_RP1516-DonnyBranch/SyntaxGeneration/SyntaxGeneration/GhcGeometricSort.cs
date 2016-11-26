@@ -17,26 +17,37 @@ namespace RP1516
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Sorting Key", "Sorting Key", "Sorting Key", GH_ParamAccess.item);
             pManager.AddGenericParameter("All Fibers", "All Fibers", "All Fibers", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Sag Threshold", "Sag Threshold", "Sag Threshold", GH_ParamAccess.item, 0.1); // uesd for removing top-top fibers, in meter
-            pManager.AddNumberParameter("Sag Fiber Density", "Sag Fiber Density", "Sag Fiber Density", GH_ParamAccess.item, 0.1); // a double between 0 and 1
-            pManager.AddNumberParameter("Curliness Threshold", "Curliness Threshold", "Curliness Threshold", GH_ParamAccess.item, 0.5);
+            //pManager.AddNumberParameter("Sag Fiber Density", "Sag Fiber Density", "Sag Fiber Density", GH_ParamAccess.item, 0.1); // a double between 0 and 1
+            //pManager.AddNumberParameter("Curliness Threshold", "Curliness Threshold", "Curliness Threshold", GH_ParamAccess.item, 0.5);
             //pManager.AddGenericParameter("Structure Input", "Structure Input", "A list of SoFiNode objects", GH_ParamAccess.list);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Sorted Fiber Curves", "Sorted Fiber Curves", "Sorted Fiber Curves", GH_ParamAccess.list); // all sorted fiber crvs
-            pManager.AddGenericParameter("Sorted Custom Fibers", "Sorted Custom Fibers", "Sorted Custom Fibers", GH_ParamAccess.list); // for XML
-            pManager.AddNumberParameter("Sorting Key Values", "Sorting Key Values", "Sorting Key Values", GH_ParamAccess.list);
+            //pManager.AddCurveParameter("Sorted Fiber Curves", "Sorted Fiber Curves", "Sorted Fiber Curves", GH_ParamAccess.list); // all sorted fiber crvs
+            //pManager.AddGenericParameter("Sorted Custom Fibers", "Sorted Custom Fibers", "Sorted Custom Fibers", GH_ParamAccess.list); // for XML
+            //pManager.AddNumberParameter("Sorting Key Values", "Sorting Key Values", "Sorting Key Values", GH_ParamAccess.list);
+
             pManager.AddCurveParameter("N", "N", "Negative", GH_ParamAccess.list);
             pManager.AddCurveParameter("P", "P", "Positive", GH_ParamAccess.list);
+
             pManager.AddCurveParameter("NC", "NC", "Nega Curly", GH_ParamAccess.list);
-            pManager.AddCurveParameter("PC", "PC", "Posi Curly", GH_ParamAccess.list);
+            pManager.AddCurveParameter("NC*", "NC*", "Nega Curly object", GH_ParamAccess.list);
+            pManager.AddCurveParameter("NC_skip", "NC_skip", "Nega Curly", GH_ParamAccess.list);
+
             pManager.AddCurveParameter("NS", "NS", "Nega Straight", GH_ParamAccess.list);
+            pManager.AddCurveParameter("NS*", "NS*", "Nega Straight object", GH_ParamAccess.list);
+            pManager.AddCurveParameter("NS_skip", "NS_skip", "Nega Straight", GH_ParamAccess.list);
+
+            pManager.AddCurveParameter("PC", "PC", "Posi Curly", GH_ParamAccess.list);
+            pManager.AddCurveParameter("PC*", "PC*", "Posi Curly object", GH_ParamAccess.list);
+            pManager.AddCurveParameter("PC_skip", "PC_skip", "Posi Curly", GH_ParamAccess.list);
+
             pManager.AddCurveParameter("PS", "PS", "Posi Straight", GH_ParamAccess.list);
-            pManager.AddGenericParameter("Skipped", "Skipped", "Skipped", GH_ParamAccess.list);
+            pManager.AddCurveParameter("PS*", "PS*", "Posi Straight object", GH_ParamAccess.list);
+            pManager.AddCurveParameter("PS_skip", "PS_skip", "Posi Straight", GH_ParamAccess.list);
+
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -44,132 +55,175 @@ namespace RP1516
             List<Fiber> AllPossibleFibers = new List<Fiber>();
             DA.GetDataList("All Fibers", AllPossibleFibers);  // big list
 
-            string SortingFactor = null;
-            DA.GetData<string>("Sorting Key", ref SortingFactor); // sorting rule
+            //threshold
+            //double curvatureThreshold = 0.5;
+            //DA.GetData<double>("Curliness Threshold", ref curvatureThreshold); // curliness threshold 
 
-            double sagThreshold = 0.1;
-            DA.GetData<double>("Sag Threshold", ref sagThreshold); // sag threshold 
+            double thre_negative = 0.5; // curvature threshold for negative fibers
+            double thre_positive = 0.5; // curvature threshold for positive fibers
 
-            double NegativeFiberDensity = 1.0;
-            DA.GetData<double>("Sag Fiber Density", ref NegativeFiberDensity); // density
+            //density
+            double den_NS = 1;
+            double den_NC = 1;
+            double den_PS = 1;
+            double den_PC = 1;
 
-            double curlyThreshold = 0.5;
-            DA.GetData<double>("Curliness Threshold", ref curlyThreshold); // curliness threshold 
+            //double NegativeFiberDensity = 0.5;
+            //DA.GetData<double>("Sag Fiber Density", ref NegativeFiberDensity); // density
 
             // -------------------------------reduce negative---------------------------------
-            List<Fiber> SkippedFibers = new List<Fiber>();
-            List<Fiber> RemainingFibers = new List<Fiber>();
+            List<Fiber> NC_all = new List<Fiber>();
+            List<Fiber> NS_all = new List<Fiber>();
+            List<Fiber> PC_all = new List<Fiber>();
+            List<Fiber> PS_all = new List<Fiber>();
 
-            // - / +
+            List<Fiber> NC_skip = new List<Fiber>();
+            List<Fiber> NC = new List<Fiber>();
+            List<Fiber> NS_skip = new List<Fiber>();
+            List<Fiber> NS = new List<Fiber>();
+            List<Fiber> PC_skip = new List<Fiber>();
+            List<Fiber> PC = new List<Fiber>();
+            List<Fiber> PS_skip = new List<Fiber>();
+            List<Fiber> PS = new List<Fiber>();
+
+            //List<Fiber> SkippedFibers = new List<Fiber>();
+            //List<Fiber> RemainingFibers = new List<Fiber>();
+
+            // N / P
             List<Fiber> NegativeFibers = AllPossibleFibers.Where(o => o.Type == "Negative").ToList(); // all negative fibers
             List<Fiber> PositiveFibers = AllPossibleFibers.Except(NegativeFibers).ToList(); //all positive fibers
 
-            // narrow down -
-            SkippedFibers.AddRange(NegativeFibers.Where(o => o.PinB.Index < 9 || o.PinB.Index > 17));
-            NegativeFibers.RemoveAll(o => o.PinB.Index < 9 || o.PinB.Index > 17);
+            // narrow down N
+            //SkippedFibers.AddRange(NegativeFibers.Where(o => o.PinB.Index < 9 || o.PinB.Index > 17));
+            //NegativeFibers.RemoveAll(o => o.PinB.Index < 9 || o.PinB.Index > 17);
 
-            // curliness 
+            // N
+            double curvatureMax_N = AllPossibleFibers.Select(o => o.Curliness).Max();
+            double curvatureMin_N = AllPossibleFibers.Select(o => o.Curliness).Min();
+            double curvatureThreshold_N = curvatureMin_N + (curvatureMax_N - curvatureMin_N) * thre_negative;
+
+            // P
+            double curvatureMax_P = AllPossibleFibers.Select(o => o.Curliness).Max();
+            double curvatureMin_P = AllPossibleFibers.Select(o => o.Curliness).Min();
+            double curvatureThreshold_P = curvatureMin_P + (curvatureMax_P - curvatureMin_P) * thre_positive;
+
+            // curvature dispatch 
             // NC
-            List<Fiber> NegaCurly = NegativeFibers
+            NC_all = NegativeFibers
                 .OrderByDescending(o => o.Curliness)
-                .Take((int)(NegativeFibers.Count * curlyThreshold))
+                .Where(o => o.Curliness > curvatureThreshold_N)
+                //.Take((int)(NegativeFibers.Count * thre_negative))
                 .ToList();
 
             // NS
-            List<Fiber> NegaStraight = NegativeFibers
-                .Except(NegaCurly)
+            NS_all = NegativeFibers
+                .Except(NC_all)
                 .ToList();                   
 
             // PC
-            List<Fiber> PosiCurly = PositiveFibers
+            PC_all = PositiveFibers
                 .OrderByDescending(o => o.Curliness)
-                .Take((int)(PositiveFibers.Count * curlyThreshold))
+                .Where(o => o.Curliness > curvatureThreshold_P)
+                //.Take((int)(PositiveFibers.Count * thre_positive))
                 .ToList(); 
 
             // PS
-            List<Fiber> PosiStraight = PositiveFibers.Except(PosiCurly).ToList();                                                  
-            
-            // reduce density
-            if (NegativeFiberDensity == 0) // density 0 
-            {
-                SkippedFibers.AddRange(NegaCurly);
-                RemainingFibers = AllPossibleFibers.Except(SkippedFibers).ToList();
-            }
+            PS_all = PositiveFibers
+                .Except(PC_all)
+                .ToList();
 
-            if (NegativeFiberDensity > 0 && NegativeFiberDensity < 1) // density 0 ~ 1
+            // density dispatch 
+            // NC 
+            NC_all.OrderBy(o => o.PinA.Position.X).ToList();
+            int groupCount_NC = (int)Math.Floor(1 / den_NC); // e.g. den_NC = 0.2, take 1 (skip 4) every 5.
+            for (int i = 0; i < (int)( (double)NC_all.Count / (double)groupCount_NC ); i = i + groupCount_NC)
             {
-                NegaCurly.OrderBy(o => o.PinA.Position.Z).ToList();
-
-                // ============================================================================
-                int skipCount = (int)Math.Floor(1 / NegativeFiberDensity);
-                for (int i = 0; i < (int)((double)NegaCurly.Count / (double)skipCount); i++)
+                NC.Add(NC_all[ i * groupCount_NC ]);
+                for (int j = 1; j < groupCount_NC; j++)
                 {
-                    for (int j = 0; j < skipCount - 1; j++) //remove
-                    {
-                        SkippedFibers.Add(NegaCurly[skipCount * i + j]);
-                        NegaCurly.Remove(NegaCurly[skipCount * i + j]);
-                    }
-                    // remain
+                    NC_skip.Add(NC_all[ i * groupCount_NC + j ]);
                 }
-                // ============================================================================
-
-                RemainingFibers = AllPossibleFibers.Except(SkippedFibers).ToList();
             }
 
-            // nega curly reduced
+            // NS 
+            NS_all.OrderBy(o => o.PinA.Position.X).ToList();
+            int groupCount_NS = (int)Math.Floor(1 / den_NS); 
+            for (int i = 0; i < (int)((double)NS_all.Count / (double)groupCount_NS); i = i + groupCount_NS)
+            {
+                NS.Add(NS_all[i * groupCount_NS]);
+                for (int j = 1; j < groupCount_NS; j++)
+                {
+                    NS_skip.Add(NS_all[i * groupCount_NS + j]);
+                }
+            }
 
-            List<Fiber> RemainingNegativeFibers = NegaCurly.Concat(NegaStraight).ToList(); // remaining nega
+            // PC 
+            PC_all.OrderBy(o => o.PinA.Position.X).ToList();
+            int groupCount_PC = (int)Math.Floor(1 / den_PC); 
+            for (int i = 0; i < (int)((double)PC_all.Count / (double)groupCount_PC); i = i + groupCount_PC)
+            {
+                PC.Add(PC_all[i * groupCount_PC]);
+                for (int j = 1; j < groupCount_PC; j++)
+                {
+                    PC_skip.Add(PC_all[i * groupCount_PC + j]);
+                }
+            }
+
+            // PS 
+            PS_all.OrderBy(o => o.PinA.Position.X).ToList();
+            int groupCount_PS = (int)Math.Floor(1 / den_PS); 
+            for (int i = 0; i < (int)((double)PS_all.Count / (double)groupCount_PS); i = i + groupCount_PS)
+            {
+                PS.Add(PS_all[i * groupCount_PS]);
+                for (int j = 1; j < groupCount_PS; j++)
+                {
+                    PS_skip.Add(PS_all[i * groupCount_PS + j]);
+                }
+            }
+
             // -------------------------------------------- Sorting --------------------------------------------
-
             // output parameters
             List<Fiber> SortedFibers = new List<Fiber>();
             List<Curve> SortedFiberCrvs = new List<Curve>();
             List<double> SortingKeyValues = new List<double>();
             List<string> FiberTypes = new List<string>();
-           
+
             #region: Curliness
-            if (SortingFactor == "Curliness")
-            {
-                double curlyMax = 0.0;
-                double curlyMin = 0.0;
-                double curlyValue = 0.0;
-                curlyMax = RemainingFibers.Select(o => o.Curliness).Max();
-                curlyMin = RemainingFibers.Select(o => o.Curliness).Min();
-                curlyValue = curlyMin + (curlyMax - curlyMin) * curlyThreshold;
+        
+            NC.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
+            NS.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
+            PS.OrderByDescending(o => o.Curliness).ToList(); // stragiht -> curve
+            PC.OrderByDescending(o => o.Curliness).ToList(); // straight ->curve
 
-                NegaCurly.OrderBy(o => o.Curliness).ToList(); // curly -> stragiht
-                NegaStraight.OrderBy(o => o.Curliness).ToList(); // curly -> stragiht
-                PosiStraight.OrderByDescending(o => o.Curliness).ToList(); // stragiht -> curly
-                PosiCurly.OrderByDescending(o => o.Curliness).ToList(); // straight ->curly
+            //for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
+            //{
+            //    SortedFibers[i].FiberSortingIndex = i;
+            //}
 
-                SortedFibers = NegaCurly
-                    .Concat(NegaStraight)
-                    .Concat(PosiStraight)
-                    .Concat(PosiCurly)
-                    .ToList();
+            //SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
+            //SortingKeyValues = SortedFibers.Select(o => o.MaximumDistance).ToList();
 
-                for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
-                {
-                    SortedFibers[i].FiberSortingIndex = i;
-                }
-                
-                SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
-                SortingKeyValues = SortedFibers.Select(o => o.MaximumDistance).ToList();
-
-            }
             #endregion
 
             // ===================================================================
-            DA.SetDataList("Sorted Custom Fibers", SortedFibers);
-            DA.SetDataList("Sorted Fiber Curves", SortedFiberCrvs);
-            DA.SetDataList("Sorting Key Values", SortingKeyValues);
             DA.SetDataList("N", NegativeFibers.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("P", PositiveFibers.Select(o => o.FiberCrv).ToList());
-            DA.SetDataList("NC", NegaCurly.Select(o => o.FiberCrv).ToList());
-            DA.SetDataList("PC", PosiCurly.Select(o => o.FiberCrv).ToList());
-            DA.SetDataList("NS", NegaStraight.Select(o => o.FiberCrv).ToList());
-            DA.SetDataList("PS", PosiStraight.Select(o => o.FiberCrv).ToList());
-            DA.SetDataList("Skipped", SkippedFibers.Select(o => o.FiberCrv).ToList());
+
+            DA.SetDataList("NC", NC.Select(o => o.FiberCrv).ToList());
+            DA.SetDataList("NC*", NC);
+            DA.SetDataList("NC_skip", NC_skip.Select(o => o.FiberCrv).ToList());
+
+            DA.SetDataList("NS", NS.Select(o => o.FiberCrv).ToList());
+            DA.SetDataList("NS*", NS);
+            DA.SetDataList("NS_skip", NS_skip.Select(o => o.FiberCrv).ToList());
+
+            DA.SetDataList("PC", PC.Select(o => o.FiberCrv).ToList());
+            DA.SetDataList("PC*", PC);
+            DA.SetDataList("PC_skip", PC_skip.Select(o => o.FiberCrv).ToList());
+
+            DA.SetDataList("PS", PS.Select(o => o.FiberCrv).ToList());
+            DA.SetDataList("PS*", PS);
+            DA.SetDataList("PS_skip", PS_skip.Select(o => o.FiberCrv).ToList());
 
         }
 

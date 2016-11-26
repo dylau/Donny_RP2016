@@ -117,7 +117,6 @@ namespace RP1516
 
         static public List<Point3d> PublicatePointsOnCurve(Curve crv, int count) // by count
         {
-            
             List<Point3d> Pts = new List<Point3d>();
             for(int i = 0; i < count; i++)
             {

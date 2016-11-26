@@ -39,9 +39,11 @@ namespace RP1516
         // instantiation
         public Fiber(Curve fiberCrv, int fiberID, string direction)
         {
-            FiberCrv = fiberCrv;
+            FiberCrv = fiberCrv.Rebuild(5,5,true);
             FiberSortingIndex = fiberID;
             Direction = direction;
+
+            //StraightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
 
             DetermineType(); // P or N?
             CalculateCurliness(); 
@@ -49,46 +51,64 @@ namespace RP1516
 
         public void DetermineType() 
         {
-            Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
-            StraightLine = straightLine; // generate a straightline
-         
-            bool flag = true;
-            List<double> distances = new List<double>(); // verticle distance, +- 
-
-            List<Point3d> PtsOnCrv = new List<Point3d>();
-            List<Point3d> PtsOnLine = new List<Point3d>();
-
             int segment = 5;
-            PtsOnCrv = Utils.PublicatePointsOnCurve(FiberCrv, segment);
-            PtsOnLine = Utils.PublicatePointsOnCurve(StraightLine.ToNurbsCurve(), segment);
 
-            for (int i = 0; i < segment; i++) // calculate the distance between crv and staightline
-            {
-                double d = PtsOnCrv[i].Z - PtsOnLine[i].Z; // negative for a negative fiber 
-                distances.Add(d);
+            bool PositiveFlag = true; // if true, positive
+            bool NegativeFlag = true; // if true, negative
 
-                if (d <= 0)
-                    ;
-                else
-                {
-                    flag = false;
-                }
-            }
+            //for (int i = 0; i < segment; i++)
+            //{
+            //    Vector3d v =  FiberCrv.CurvatureAt((double)i / (double)segment);
 
-            MeanDistance = distances.Sum() / (double)segment; // +-
-            MaximumDistance = - distances.Min(); // +
+            //    if (v.Z < 0) 
+            //        NegativeFlag = false;
+            //    if (v.Z > 0)
+            //        PositiveFlag = false;
+            //}
 
-            if (flag)
+            //if (PositiveFlag)
+            //    Type = "Postitive";
+            //if (NegativeFlag)
+            //    Type = "Negative";
+            //if (!PositiveFlag && !NegativeFlag)
+            //    Type = "Mixed";
+
+            if (FiberCrv.CurvatureAt(0.5).Z > 0) // N
                 Type = "Negative";
-            else
-                Type = "Positive and Both";
+            if (FiberCrv.CurvatureAt(0.5).Z < 0) // N
+                Type = "Positive";
+
+
+
+            //List<double> distances = new List<double>(); // verticle distance, +- 
+
+            //List<Point3d> PtsOnCrv = new List<Point3d>();
+            //List<Point3d> PtsOnLine = new List<Point3d>();
+
+            //PtsOnCrv = Utils.PublicatePointsOnCurve(FiberCrv, segment);
+            //PtsOnLine = Utils.PublicatePointsOnCurve(StraightLine.ToNurbsCurve(), segment);
+
+            //for (int i = 0; i < segment; i++) // calculate the distance between crv and staightline
+            //{
+            //    double d = PtsOnCrv[i].Z - PtsOnLine[i].Z; // negative for a negative fiber 
+            //    distances.Add(d);
+
+
+            //}
+
+            //MeanDistance = distances.Sum() / (double)segment; // +-
+            //MaximumDistance = - distances.Min(); // +
+
+            //if (flag)
+            //    Type = "Negative";
+            //else
+            //    Type = "Positive and Both";
+
         }
 
         public void CalculateCurliness()
         {
-            Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
-            StraightLine = straightLine; // generate a straightline
-            
+            // generate pts on curve and straight line
             int segment = 10;
             List<Point3d> PtsCrv = new List<Point3d>();
             List<Point3d> PtsLine = new List<Point3d>();
@@ -97,7 +117,7 @@ namespace RP1516
 
             for (int i = 0; i < segment; i++) // calculate the distance between crv and staightline
             {
-                double d = Math.Sqrt(PtsCrv[i].DistanceTo(PtsLine[i])); // negative
+                double d = Math.Sqrt( PtsCrv[i].DistanceTo(PtsLine[i])) ; // negative
                 Curliness += d;
             }
 
