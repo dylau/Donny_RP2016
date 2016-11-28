@@ -16,6 +16,7 @@ namespace RP1516
         public Pin PinA = null;
         public Pin PinB = null;
         public Line StraightLine;
+        public List<Point3d> PtsOnCurve;
 
         // basic info
         public string StartPinID = null; // e.g. A000, A001
@@ -29,7 +30,7 @@ namespace RP1516
 
         // sorting keys 
         public double IntegratedScore; // for nonchains
-        public double Curliness;
+        public double Curliness = 0;
         public double MaximumDistance; // absolute value
         public double MeanDistance;
 
@@ -108,16 +109,21 @@ namespace RP1516
 
         public void CalculateCurliness()
         {
+            Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
+            StraightLine = straightLine; 
+
             // generate pts on curve and straight line
             int segment = 10;
             List<Point3d> PtsCrv = new List<Point3d>();
             List<Point3d> PtsLine = new List<Point3d>();
             PtsCrv = Utils.PublicatePointsOnCurve(FiberCrv, segment);
             PtsLine = Utils.PublicatePointsOnCurve(StraightLine.ToNurbsCurve(), segment);
-
+            PtsOnCurve = PtsCrv;
+            Curliness = 0;
             for (int i = 0; i < segment; i++) // calculate the distance between crv and staightline
             {
-                double d = Math.Sqrt( PtsCrv[i].DistanceTo(PtsLine[i])) ; // negative
+
+                double d = Math.Sqrt( PtsCrv[i].DistanceTo(PtsLine[i]) * PtsCrv[i].DistanceTo(PtsLine[i])); 
                 Curliness += d;
             }
 

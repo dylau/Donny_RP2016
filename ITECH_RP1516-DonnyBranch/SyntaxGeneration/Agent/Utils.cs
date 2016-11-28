@@ -63,7 +63,7 @@ namespace RP1516
                 {
                    
                     Curve fiberCrv = GeodesicLine(srf, pinsA[i].Position, pinsB[j].Position);
-                    fiberCrvs.Add(fiberCrv);
+                    fiberCrvs.Add(fiberCrv.Rebuild(9,10,true));
 
                     Fiber ifiber = new Fiber(fiberCrv, -1, "AB");
                     ifiber.StartPinID = pinsA[i].PinID;

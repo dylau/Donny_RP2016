@@ -18,17 +18,15 @@ namespace RP1516
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("All Fibers", "All Fibers", "All Fibers", GH_ParamAccess.list);
-            //pManager.AddNumberParameter("Sag Fiber Density", "Sag Fiber Density", "Sag Fiber Density", GH_ParamAccess.item, 0.1); // a double between 0 and 1
-            //pManager.AddNumberParameter("Curliness Threshold", "Curliness Threshold", "Curliness Threshold", GH_ParamAccess.item, 0.5);
-            //pManager.AddGenericParameter("Structure Input", "Structure Input", "A list of SoFiNode objects", GH_ParamAccess.list);
+            pManager.AddNumberParameter("density NC", "density NC", "density NC", GH_ParamAccess.item);
+            pManager.AddNumberParameter("density NS", "density NS", "density NS", GH_ParamAccess.item);
+            pManager.AddNumberParameter("density PC", "density PC", "density PC", GH_ParamAccess.item);
+            pManager.AddNumberParameter("density PS", "density PS", "density PS", GH_ParamAccess.item);
+
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            //pManager.AddCurveParameter("Sorted Fiber Curves", "Sorted Fiber Curves", "Sorted Fiber Curves", GH_ParamAccess.list); // all sorted fiber crvs
-            //pManager.AddGenericParameter("Sorted Custom Fibers", "Sorted Custom Fibers", "Sorted Custom Fibers", GH_ParamAccess.list); // for XML
-            //pManager.AddNumberParameter("Sorting Key Values", "Sorting Key Values", "Sorting Key Values", GH_ParamAccess.list);
-
             pManager.AddCurveParameter("N", "N", "Negative", GH_ParamAccess.list);
             pManager.AddCurveParameter("P", "P", "Positive", GH_ParamAccess.list);
 
@@ -55,23 +53,20 @@ namespace RP1516
             List<Fiber> AllPossibleFibers = new List<Fiber>();
             DA.GetDataList("All Fibers", AllPossibleFibers);  // big list
 
-            //threshold
-            //double curvatureThreshold = 0.5;
-            //DA.GetData<double>("Curliness Threshold", ref curvatureThreshold); // curliness threshold 
-
             double thre_negative = 0.5; // curvature threshold for negative fibers
             double thre_positive = 0.5; // curvature threshold for positive fibers
 
-            //density
-            double den_NS = 1;
-            double den_NC = 1;
-            double den_PS = 1;
-            double den_PC = 1;
+            //density, default 0.5
+            double den_NC = 0.5;
+            DA.GetData("density NC", ref den_NC);
+            double den_NS = 0.5;
+            DA.GetData("density NS", ref den_NS);
+            double den_PC = 0.5;
+            DA.GetData("density PC", ref den_PC);
+            double den_PS = 0.5;
+            DA.GetData("density PS", ref den_PS);
 
-            //double NegativeFiberDensity = 0.5;
-            //DA.GetData<double>("Sag Fiber Density", ref NegativeFiberDensity); // density
-
-            // -------------------------------reduce negative---------------------------------
+            // ------------------------------- N/P dispatch ---------------------------------
             List<Fiber> NC_all = new List<Fiber>();
             List<Fiber> NS_all = new List<Fiber>();
             List<Fiber> PC_all = new List<Fiber>();
@@ -86,17 +81,11 @@ namespace RP1516
             List<Fiber> PS_skip = new List<Fiber>();
             List<Fiber> PS = new List<Fiber>();
 
-            //List<Fiber> SkippedFibers = new List<Fiber>();
-            //List<Fiber> RemainingFibers = new List<Fiber>();
-
             // N / P
             List<Fiber> NegativeFibers = AllPossibleFibers.Where(o => o.Type == "Negative").ToList(); // all negative fibers
             List<Fiber> PositiveFibers = AllPossibleFibers.Except(NegativeFibers).ToList(); //all positive fibers
 
-            // narrow down N
-            //SkippedFibers.AddRange(NegativeFibers.Where(o => o.PinB.Index < 9 || o.PinB.Index > 17));
-            //NegativeFibers.RemoveAll(o => o.PinB.Index < 9 || o.PinB.Index > 17);
-
+            // ------------------------------- curvature dispatch ---------------------------------
             // N
             double curvatureMax_N = AllPossibleFibers.Select(o => o.Curliness).Max();
             double curvatureMin_N = AllPossibleFibers.Select(o => o.Curliness).Min();
@@ -107,12 +96,11 @@ namespace RP1516
             double curvatureMin_P = AllPossibleFibers.Select(o => o.Curliness).Min();
             double curvatureThreshold_P = curvatureMin_P + (curvatureMax_P - curvatureMin_P) * thre_positive;
 
-            // curvature dispatch 
             // NC
             NC_all = NegativeFibers
                 .OrderByDescending(o => o.Curliness)
-                .Where(o => o.Curliness > curvatureThreshold_N)
-                //.Take((int)(NegativeFibers.Count * thre_negative))
+                //.Where(o => o.Curliness > curvatureThreshold_N)
+                .Take((int)(NegativeFibers.Count * thre_negative))
                 .ToList();
 
             // NS
@@ -123,8 +111,8 @@ namespace RP1516
             // PC
             PC_all = PositiveFibers
                 .OrderByDescending(o => o.Curliness)
-                .Where(o => o.Curliness > curvatureThreshold_P)
-                //.Take((int)(PositiveFibers.Count * thre_positive))
+                //.Where(o => o.Curliness > curvatureThreshold_P)
+                .Take((int)(PositiveFibers.Count * thre_positive))
                 .ToList(); 
 
             // PS
@@ -132,7 +120,7 @@ namespace RP1516
                 .Except(PC_all)
                 .ToList();
 
-            // density dispatch 
+            // ------------------------------- density dispatch ---------------------------------
             // NC 
             NC_all.OrderBy(o => o.PinA.Position.X).ToList();
             int groupCount_NC = (int)Math.Floor(1 / den_NC); // e.g. den_NC = 0.2, take 1 (skip 4) every 5.
@@ -224,7 +212,6 @@ namespace RP1516
             DA.SetDataList("PS", PS.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("PS*", PS);
             DA.SetDataList("PS_skip", PS_skip.Select(o => o.FiberCrv).ToList());
-
         }
 
         protected override System.Drawing.Bitmap Icon
