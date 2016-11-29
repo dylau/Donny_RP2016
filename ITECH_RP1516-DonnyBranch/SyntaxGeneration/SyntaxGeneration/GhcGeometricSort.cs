@@ -31,19 +31,19 @@ namespace RP1516
             pManager.AddCurveParameter("P", "P", "Positive", GH_ParamAccess.list);
 
             pManager.AddCurveParameter("NC", "NC", "Nega Curly", GH_ParamAccess.list);
-            pManager.AddCurveParameter("NC*", "NC*", "Nega Curly object", GH_ParamAccess.list);
+            pManager.AddGenericParameter("NC*", "NC*", "Nega Curly object", GH_ParamAccess.list);
             pManager.AddCurveParameter("NC_skip", "NC_skip", "Nega Curly", GH_ParamAccess.list);
 
             pManager.AddCurveParameter("NS", "NS", "Nega Straight", GH_ParamAccess.list);
-            pManager.AddCurveParameter("NS*", "NS*", "Nega Straight object", GH_ParamAccess.list);
+            pManager.AddGenericParameter("NS*", "NS*", "Nega Straight object", GH_ParamAccess.list);
             pManager.AddCurveParameter("NS_skip", "NS_skip", "Nega Straight", GH_ParamAccess.list);
 
             pManager.AddCurveParameter("PC", "PC", "Posi Curly", GH_ParamAccess.list);
-            pManager.AddCurveParameter("PC*", "PC*", "Posi Curly object", GH_ParamAccess.list);
+            pManager.AddGenericParameter("PC*", "PC*", "Posi Curly object", GH_ParamAccess.list);
             pManager.AddCurveParameter("PC_skip", "PC_skip", "Posi Curly", GH_ParamAccess.list);
 
             pManager.AddCurveParameter("PS", "PS", "Posi Straight", GH_ParamAccess.list);
-            pManager.AddCurveParameter("PS*", "PS*", "Posi Straight object", GH_ParamAccess.list);
+            pManager.AddGenericParameter("PS*", "PS*", "Posi Straight object", GH_ParamAccess.list);
             pManager.AddCurveParameter("PS_skip", "PS_skip", "Posi Straight", GH_ParamAccess.list);
 
         }

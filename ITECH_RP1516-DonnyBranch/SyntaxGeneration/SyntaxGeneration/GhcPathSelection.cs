@@ -20,17 +20,24 @@ namespace RP1516
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Sorted Custom Fibers", "Sorted Custom Fibers", "Sorted Custom Fibers", GH_ParamAccess.list);
-            //pManager.AddNumberParameter("Order Tolerance", "Order Tolerance", "Order Tolerance", GH_ParamAccess.item); // how many fibers is it allowed to go back in the sorted list?
-            //pManager.AddNumberParameter("Neighbour Range", "Neighbour Range", "Neighbour Range", GH_ParamAccess.item); // neighbours considered when searching for next fiber
+            pManager.AddGenericParameter("Fiber set 1", "Fiber set 1", "Fiber set 1", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Fiber set 2", "Fiber set 2", "Fiber set 2", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Fiber set 3", "Fiber set 3", "Fiber set 3", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Fiber set 4", "Fiber set 4", "Fiber set 4", GH_ParamAccess.list);
             pManager.AddNumberParameter("Pin Capacity", "Pin Capacity", "Pin Capacity", GH_ParamAccess.item); // maximum pin capacity
-            pManager.AddNumberParameter("Fiber Amount", "Fiber Amount", "how many fiber do you want to laid?", GH_ParamAccess.item);
+
+            //pManager.AddNumberParameter("Order Tolerance", "Order Tolerance", "Order Tolerance", GH_ParamAccess.item); // how many fibers is it allowed to go back in the sorted list?
             //pManager.AddNumberParameter("Duplicate Maximum", "Duplicate Maximum", "Duplicate Maximum", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Remove Edge", "Remove Edge", "Remove Edge", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
+            pManager.AddCurveParameter("Fiber set 1 sequenced", "Fiber set 1 sequenced", "Fiber set 1 sequenced", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Fiber set 2 sequenced", "Fiber set 2 sequenced", "Fiber set 2 sequenced", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Fiber set 3 sequenced", "Fiber set 3 sequenced", "Fiber set 3 sequenced", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Fiber set 4 sequenced", "Fiber set 4 sequenced", "Fiber set 4 sequenced", GH_ParamAccess.list);
+
+
             pManager.AddGenericParameter("Custom Fibers", "Custom Fibers", "Custom Fibers", GH_ParamAccess.list);
             pManager.AddCurveParameter("Fiber Curves", "Fiber Curves", "Fiber Curves", GH_ParamAccess.list);
             pManager.AddCurveParameter("Skipped Fiber Curves", "Skipped Fiber Curves", "Skipped Fiber Curves to achieve continuity", GH_ParamAccess.list);
@@ -40,8 +47,26 @@ namespace RP1516
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<Fiber> SortedFibersBigList = new List<Fiber>();
-            DA.GetDataList<Fiber>("Sorted Custom Fibers", SortedFibersBigList);
+            List<Fiber> FiberSet1 = new List<Fiber>();
+            DA.GetDataList<Fiber>("Fiber set 1", FiberSet1);
+            List<Fiber> FiberSet2 = new List<Fiber>();
+            DA.GetDataList<Fiber>("Fiber set 2", FiberSet2);
+            List<Fiber> FiberSet3 = new List<Fiber>();
+            DA.GetDataList<Fiber>("Fiber set 3", FiberSet3);
+            List<Fiber> FiberSet4 = new List<Fiber>();
+            DA.GetDataList<Fiber>("Fiber set 4", FiberSet4);
+
+            List<Fiber> SortedFibersBigList = FiberSet1
+                .Concat(FiberSet2)
+                .Concat(FiberSet3)
+                .Concat(FiberSet4)
+                .ToList();
+
+            for (int i = 0; i < SortedFibersBigList.Count; i++) // change fiber sorting ID
+            {
+                SortedFibersBigList[i].FiberSortingIndex = i;
+            }
+
             //double tolerance = 0.0; 
             //DA.GetData<double>("Order Tolerance", ref tolerance);
             double pinCapacity = 0.0;
@@ -71,15 +96,13 @@ namespace RP1516
                 SortedFibers = SortedFibersBigList;
             }
 
-            double RemoveEdge = 0.0;
-            DA.GetData<double>("Remove Edge", ref RemoveEdge);
 
             // component output
             List<Fiber> FiberSyntax = new List<Fiber>();
             List<string> PinIDsNote = new List<string>();
 
             // initialize
-            PathAgent PathAgent = new PathAgent(SortedFibers[0].PinA, SortedFibers[0], SortedFibers, RemoveEdge, pinCapacity); // the first pin is pinA of the first fiber on the list 
+            PathAgent PathAgent = new PathAgent(SortedFibers[0].PinA, SortedFibers[0], SortedFibers, pinCapacity); // the first pin is pinA of the first fiber on the list 
             FiberSyntax.Add(SortedFibers[0]);
             SortedFibers[0].Direction = "AB";
             SortedFibers[0].StartPinID = "A";

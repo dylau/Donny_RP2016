@@ -80,7 +80,7 @@
     <Compile Include="SyntaxGeneration\GhcFiberGeneration.cs" />
     <Compile Include="SyntaxGeneration\GhcGeometricSort.cs" />
     <Compile Include="SyntaxGeneration\GhcStructureInput.cs" />
-    <Compile Include="SyntaxGeneration\PathSelection.cs" />
+    <Compile Include="SyntaxGeneration\GhcPathSelection.cs" />
     <Compile Include="TaskList\GhcXmlWriter.cs" />
     <Compile Include="TaskList\StepXml.cs" />
     <Compile Include="TaskList\TaskNode.cs" />

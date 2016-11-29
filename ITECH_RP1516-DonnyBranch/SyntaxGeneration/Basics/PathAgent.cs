@@ -24,7 +24,7 @@ namespace RP1516
         public double RemoveEdge;
         public double PinCapacity;
 
-        public PathAgent(Pin initialPin, Fiber initialFiber, List<Fiber> sortedFibers, double removeEdge, double pinCapacity)
+        public PathAgent(Pin initialPin, Fiber initialFiber, List<Fiber> sortedFibers, double pinCapacity)
         {
             CurrentPin = initialPin;
             CurrentFiber = initialFiber;
@@ -34,7 +34,6 @@ namespace RP1516
             FiberSerachingDone = false;
             SkippedFibers = new List<Fiber>();
             SortedFibers = sortedFibers;
-            RemoveEdge = removeEdge;
             PinCapacity = pinCapacity;
         }
 
