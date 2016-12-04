@@ -81,8 +81,8 @@ namespace RP1516
                     //if (CurrentFiber.FiberSortingIndex - iFiber.FiberSortingIndex > Tolerance) // skip fibers for better curvature
                     //    SkippedFibers.Add(iFiber);
                     // 3.edge condition: both too small or both to big, skip
-                    else if ((CurrentPin.Index > (60 - RemoveEdge) && iFiber.PinB.Index > (26 - RemoveEdge)) || (CurrentPin.Index < RemoveEdge && iFiber.PinB.Index < RemoveEdge))
-                        SkippedFibers.Add(iFiber);
+                    //else if ((CurrentPin.Index > (60 - RemoveEdge) && iFiber.PinB.Index > (26 - RemoveEdge)) || (CurrentPin.Index < RemoveEdge && iFiber.PinB.Index < RemoveEdge))
+                    //    SkippedFibers.Add(iFiber);
                     //if (CurrentPin.Position.Z < 1 && iFiber.PinB.Position.Z < 1)
                     //SkippedFibers.Add(iFiber);
 
@@ -115,8 +115,8 @@ namespace RP1516
                     //if (CurrentFiber.FiberSortingIndex - iFiber.FiberSortingIndex > Tolerance) // skip fibers for better curvature
                     //    SkippedFibers.Add(iFiber);
                     // 3.edge condition: both too small or both to big, skip
-                    else if ((CurrentPin.Index > (26 - RemoveEdge) && iFiber.PinB.Index > (60 - RemoveEdge)) || (CurrentPin.Index < RemoveEdge && iFiber.PinA.Index < RemoveEdge))
-                        SkippedFibers.Add(iFiber);
+                    //else if ((CurrentPin.Index > (26 - RemoveEdge) && iFiber.PinB.Index > (60 - RemoveEdge)) || (CurrentPin.Index < RemoveEdge && iFiber.PinA.Index < RemoveEdge))
+                    //    SkippedFibers.Add(iFiber);
                     //if (CurrentPin.Position.Z < 1 && iFiber.PinB.Position.Z < 1)
                     //SkippedFibers.Add(iFiber);
 

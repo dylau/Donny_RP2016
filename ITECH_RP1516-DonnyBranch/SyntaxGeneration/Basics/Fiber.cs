@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rhino.Geometry;
-using RP2k1516;
-using Rhino.Geometry.Intersect;
 
 namespace RP1516
 {
@@ -17,6 +13,7 @@ namespace RP1516
         public Pin PinB = null;
         public Line StraightLine;
         public List<Point3d> PtsOnCurve;
+        public List<Point3d> PtsOnLine;
 
         // basic info
         public string StartPinID = null; // e.g. A000, A001
@@ -29,101 +26,59 @@ namespace RP1516
         public string Type = null; // Positive, Negative, Mixed
 
         // sorting keys 
-        public double IntegratedScore; // for nonchains
         public double Curliness = 0;
-        public double MaximumDistance; // absolute value
-        public double MeanDistance;
 
         // structure parameter
-        public double StructureFactor = 0.0; // bigger factor shows more importance
+        public double StructureFactor = 0.0; // bigger factor indicates more important fibers 
 
-        // instantiation
+
         public Fiber(Curve fiberCrv, int fiberID, string direction)
         {
             FiberCrv = fiberCrv.Rebuild(5,5,true);
             FiberSortingIndex = fiberID;
             Direction = direction;
 
-            //StraightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
-
             DetermineType(); // P or N?
-            CalculateCurliness(); 
+            CalculateCurliness();
+
+
         }
 
         public void DetermineType() 
         {
-            int segment = 5;
+            int segment = 6;
+            double increment = 1 / (double)segment;
 
-            bool PositiveFlag = true; // if true, positive
-            bool NegativeFlag = true; // if true, negative
+            List<bool> curvatureFlag = new List<bool>();
 
-            //for (int i = 0; i < segment; i++)
-            //{
-            //    Vector3d v =  FiberCrv.CurvatureAt((double)i / (double)segment);
+            for (int i = 1; i < segment; i++) // check (segment - 1) points
+            {
+                curvatureFlag.Add(FiberCrv.CurvatureAt(increment * i).Z > 0); // if true, Negative
+            }
 
-            //    if (v.Z < 0) 
-            //        NegativeFlag = false;
-            //    if (v.Z > 0)
-            //        PositiveFlag = false;
-            //}
-
-            //if (PositiveFlag)
-            //    Type = "Postitive";
-            //if (NegativeFlag)
-            //    Type = "Negative";
-            //if (!PositiveFlag && !NegativeFlag)
-            //    Type = "Mixed";
-
-            if (FiberCrv.CurvatureAt(0.5).Z > 0) // N
+            int tolerance = 1; // allow tolerance points to be different curved 
+            if (curvatureFlag.Where(o => o == true).Count() >= segment - 1 - tolerance)
                 Type = "Negative";
-            if (FiberCrv.CurvatureAt(0.5).Z < 0) // N
+            else if (curvatureFlag.Where(o => o == false).Count() >= segment - 1 - tolerance)
                 Type = "Positive";
-
-
-
-            //List<double> distances = new List<double>(); // verticle distance, +- 
-
-            //List<Point3d> PtsOnCrv = new List<Point3d>();
-            //List<Point3d> PtsOnLine = new List<Point3d>();
-
-            //PtsOnCrv = Utils.PublicatePointsOnCurve(FiberCrv, segment);
-            //PtsOnLine = Utils.PublicatePointsOnCurve(StraightLine.ToNurbsCurve(), segment);
-
-            //for (int i = 0; i < segment; i++) // calculate the distance between crv and staightline
-            //{
-            //    double d = PtsOnCrv[i].Z - PtsOnLine[i].Z; // negative for a negative fiber 
-            //    distances.Add(d);
-
-
-            //}
-
-            //MeanDistance = distances.Sum() / (double)segment; // +-
-            //MaximumDistance = - distances.Min(); // +
-
-            //if (flag)
-            //    Type = "Negative";
-            //else
-            //    Type = "Positive and Both";
+            else
+                Type = "Mix";
 
         }
 
         public void CalculateCurliness()
         {
             Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
-            StraightLine = straightLine; 
+            StraightLine = straightLine;
 
-            // generate pts on curve and straight line
-            int segment = 10;
-            List<Point3d> PtsCrv = new List<Point3d>();
-            List<Point3d> PtsLine = new List<Point3d>();
-            PtsCrv = Utils.PublicatePointsOnCurve(FiberCrv, segment);
-            PtsLine = Utils.PublicatePointsOnCurve(StraightLine.ToNurbsCurve(), segment);
-            PtsOnCurve = PtsCrv;
+            int Segment = 10;
+            PtsOnCurve = Utils.PublicatePointsOnCurve(FiberCrv, Segment);
+            PtsOnLine = Utils.PublicatePointsOnCurve(StraightLine.ToNurbsCurve(), Segment);
+
             Curliness = 0;
-            for (int i = 0; i < segment; i++) // calculate the distance between crv and staightline
+            for (int i = 0; i < Segment; i++) // calculate the distance between crv and staightline
             {
-
-                double d = Math.Sqrt( PtsCrv[i].DistanceTo(PtsLine[i]) * PtsCrv[i].DistanceTo(PtsLine[i])); 
+                double d = Math.Sqrt( PtsOnCurve[i].DistanceTo(PtsOnLine[i]) * PtsOnCurve[i].DistanceTo(PtsOnLine[i]) ); 
                 Curliness += d;
             }
 
