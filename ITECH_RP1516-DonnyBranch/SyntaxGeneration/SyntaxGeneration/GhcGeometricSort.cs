@@ -78,10 +78,10 @@ namespace RP1516
             DA.GetData("density Mix", ref den_Mix);
 
             // ------------------------------- N/P dispatch ---------------------------------
-            List<Fiber> NC_all = new List<Fiber>();
-            List<Fiber> NS_all = new List<Fiber>();
-            List<Fiber> PC_all = new List<Fiber>();
-            List<Fiber> PS_all = new List<Fiber>();
+            //List<Fiber> NC_all = new List<Fiber>();
+            //List<Fiber> NS_all = new List<Fiber>();
+            //List<Fiber> PC_all = new List<Fiber>();
+            //List<Fiber> PS_all = new List<Fiber>();
 
             List<Fiber> NC_skip = new List<Fiber>();
             List<Fiber> NC = new List<Fiber>();
@@ -113,26 +113,26 @@ namespace RP1516
             double curvatureThreshold_P = curvatureMin_P + (curvatureMax_P - curvatureMin_P) * thre_positive;
 
             // NC
-            NC_all = NegativeFibers
+            List<Fiber> NC_all = NegativeFibers
                 //.OrderByDescending(o => o.Curliness)
                 .Where(o => o.Curliness > curvatureThreshold_N)
                 //.Take((int)(NegativeFibers.Count * thre_negative))
                 .ToList();
 
             // NS
-            NS_all = NegativeFibers
+            List<Fiber> NS_all = NegativeFibers
                 .Except(NC_all)
-                .ToList();                   
+                .ToList();
 
             // PC
-            PC_all = PositiveFibers
+            List<Fiber> PC_all = PositiveFibers
                 //.OrderByDescending(o => o.Curliness)
                 .Where(o => o.Curliness > curvatureThreshold_P)
                 //.Take((int)(PositiveFibers.Count * thre_positive))
-                .ToList(); 
+                .ToList();
 
             // PS
-            PS_all = PositiveFibers
+            List<Fiber> PS_all = PositiveFibers
                 .Except(PC_all)
                 .ToList();
 
@@ -209,7 +209,7 @@ namespace RP1516
             NS.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
             PS.OrderByDescending(o => o.Curliness).ToList(); // stragiht -> curve
             PC.OrderByDescending(o => o.Curliness).ToList(); // straight -> curve
-            Mix.OrderBy(o => o.Curliness).ToList(); // sttaight -> curve
+            Mix.OrderBy(o => o.Curliness).ToList(); // straight -> curve
 
             // change fiber sorting ID
             for (int i = 0; i < NC.Count; i++)

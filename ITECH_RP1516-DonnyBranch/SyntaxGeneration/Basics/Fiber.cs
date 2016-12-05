@@ -62,7 +62,7 @@ namespace RP1516
                 curvatureFlag.Add(FiberCrv.CurvatureAt(increment * i).Z > 0); // if true, Negative
             }
 
-            int tolerance = 2; // allow tolerance points to be different curved 
+            int tolerance = 2; // allow tolerance points to be different curved; bigger, less mix
             if (curvatureFlag.Where(o => o == true).Count() >= segment - 1 - tolerance)
                 Type = "Negative";
             else if (curvatureFlag.Where(o => o == false).Count() >= segment - 1 - tolerance)

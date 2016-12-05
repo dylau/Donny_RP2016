@@ -121,7 +121,6 @@ namespace RP1516
             List<Curve> AllFiberCurves = new List<Curve>();
             AllFiberCurves = AllPossibleFibers.Select(o => o.FiberCrv).ToList();
             DA.SetDataList("All Fiber Curves", AllFiberCurves);
-
         }
 
 

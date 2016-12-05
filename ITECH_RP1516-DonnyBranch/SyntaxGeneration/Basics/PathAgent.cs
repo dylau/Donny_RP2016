@@ -18,14 +18,14 @@ namespace RP1516
         public List<double> FiberFabricationIndexNote; // indicate the fabrication order of the sorted fibers, used to check how the syntax is defferent from sorted order
         public double Tolerance;
         public double SyntaxEvaluation; // evaluate how the path selection is contradictory to the curvature
-        public double DuplicateMax; // the maximum amount of fiber a connection can repeat
+        public double DuplicateMax = 1; // the maximum amount of fiber a connection can repeat
         public List<Fiber> SortedFibers;
         public double RemoveEdge;
         public double PinCapacity;
 
-        public bool FiberSearchFlag; 
+        public bool FiberSearchFlag = true; 
 
-        public PathAgent(Pin initialPin, Fiber initialFiber, List<Fiber> sortedFibers, double pinCapacity)
+        public PathAgent(Pin initialPin, Fiber initialFiber, List<Fiber> sortedFibers)
         {
             CurrentPin = initialPin;
             CurrentFiber = initialFiber;
@@ -34,8 +34,6 @@ namespace RP1516
             SyntaxEvaluation = 0.0;
             SkippedFibers = new List<Fiber>();
             SortedFibers = sortedFibers;
-            PinCapacity = pinCapacity;
-            DuplicateMax = 5; //!!! larger enables better chance to lay the whole syntax continously
         }
 
         public void GoToTheOtherPin()
@@ -54,12 +52,11 @@ namespace RP1516
         public void SearchFiber()
         {
             // group visable fibers from the current pin and its neighbour pins
-
-                List<Fiber> VisibleNeighbourFibers = new List<Fiber>();
-                CurrentPin.NeighbourPins.ForEach(o => VisibleNeighbourFibers.AddRange(o.VisibleFibers)); // group all visible fibers of the neighbour pins
-                VisibleFibers = CurrentPin.VisibleFibers.Concat(VisibleNeighbourFibers).ToList(); // include the visible fibers of itself
-                VisibleFibers.Remove(CurrentFiber); // remove the just laid fiber out of the visible fiber list
-                VisibleFibers.RemoveAll(o => !SortedFibers.Contains(o));
+            List<Fiber> VisibleNeighbourFibers = new List<Fiber>();
+            CurrentPin.NeighbourPins.ForEach(o => VisibleNeighbourFibers.AddRange(o.VisibleFibers)); // group all visible fibers of the neighbour pins
+            VisibleFibers = CurrentPin.VisibleFibers.Concat(VisibleNeighbourFibers).ToList(); // include the visible fibers of itself
+            VisibleFibers.Remove(CurrentFiber); // remove the just laid fiber out of the visible fiber list
+            VisibleFibers.RemoveAll(o => !SortedFibers.Contains(o));
 
             // sort from good to bad
             List<Fiber> SortedVisableFibers = VisibleFibers.OrderBy(o => o.FiberSortingIndex).ToList(); // !!! very important
@@ -67,38 +64,32 @@ namespace RP1516
             for (int i = 0; i < SortedVisableFibers.Count; i++) // loop from good to bad in the fiber candidates, once all constrains satisfied, search done, next fiber decided.
             {
                 Fiber iFiber = SortedVisableFibers[i];
-                if (iFiber.LaidCount > DuplicateMax)
+
+                if (iFiber.LaidCount > DuplicateMax) // skip duplicate 
+                {
                     ;
+                    if (i == SortedVisableFibers.Count - 1) // already last visible fiber
+                        FiberSearchFlag = false;
+                    else
+                        ;
+                }
+
                 else
                 {
                     if (CurrentPin.FrameID == "A")
                     {
                         CurrentPin = iFiber.PinA; // update current pin to its neighbour/itself on same frame
-                                                  // constrains
-                                                  // 1. skip fiber already laid
-                        List<int> connectedPinIDs = CurrentPin.ConnectedPins.Select(o => o.Index).ToList(); // all already connected pins' ID
-                        if (connectedPinIDs.Exists(o => o == iFiber.PinB.Index)) // the nearest fiber is alrealdy laid, go to next near fiber, no duplication is allowed
-                            FiberSearchFlag = false;
-                        // 4. out of pin capacity
-                        //if (CurrentFiber.PinB.ConnectedPins.Count > PinCapacity)
-                        //    SkippedFibers.Add(iFiber);
-                        // 2. do not allow too much set back
-                        //if (CurrentFiber.FiberSortingIndex - iFiber.FiberSortingIndex > Tolerance) // skip fibers for better curvature
-                        //    SkippedFibers.Add(iFiber);
 
-                        // all constrains are saticfied
-                        else
-                        {
-                            FiberSearchFlag = true;
+                        FiberSearchFlag = true;
 
-                            CurrentFiber = iFiber;
-                            FiberFabricationIndexNote.Add(iFiber.FiberSortingIndex);
+                        CurrentFiber = iFiber;
+                        FiberFabricationIndexNote.Add(iFiber.FiberSortingIndex);
 
-                            iFiber.LaidCount += 1; // Add connection info
-                            iFiber.PinA.ConnectedPins.Add(iFiber.PinB);
-                            iFiber.PinB.ConnectedPins.Add(CurrentPin);
-                            break;
-                        }
+                        iFiber.LaidCount += 1; // Add connection info
+                        iFiber.PinA.ConnectedPins.Add(iFiber.PinB);
+                        iFiber.PinB.ConnectedPins.Add(CurrentPin);
+                        break;
+                        //}
                     }
 
                     if (CurrentPin.FrameID == "B")
@@ -106,29 +97,23 @@ namespace RP1516
                         CurrentPin = iFiber.PinB;
                         // constrains
                         // 1. skip fiber already laid
-                        List<int> connectedPinIDs = CurrentPin.ConnectedPins.Select(o => o.Index).ToList();
-                        if (connectedPinIDs.Exists(o => o == iFiber.PinA.Index)) // the nearest fiber is alrealdy laid, go to next near fiber, no duplication is allowed
-                            FiberSearchFlag = false;
-                        // 4. out of pin capacity
-                        //if (CurrentFiber.PinA.ConnectedPins.Count > PinCapacity)
-                        //    SkippedFibers.Add(iFiber);
-                        // 2. do not allow too much set back
-                        //if (CurrentFiber.FiberSortingIndex - iFiber.FiberSortingIndex > Tolerance) // skip fibers for better curvature
-                        //    SkippedFibers.Add(iFiber);
+                        //List<int> connectedPinIDs = CurrentPin.ConnectedPins.Select(o => o.Index).ToList();
+                        //if (connectedPinIDs.Exists(o => o == iFiber.PinA.Index)) // the nearest fiber is alrealdy laid, go to next near fiber, no duplication is allowed
+                        //    FiberSearchFlag = false;
 
                         // all constrains are saticfied
-                        else
-                        {
-                            FiberSearchFlag = true;
+                        //else
+                        //{
+                        FiberSearchFlag = true;
 
-                            CurrentFiber = iFiber;
-                            FiberFabricationIndexNote.Add(iFiber.FiberSortingIndex);
+                        CurrentFiber = iFiber;
+                        FiberFabricationIndexNote.Add(iFiber.FiberSortingIndex); //!!!
 
-                            iFiber.LaidCount += 1; // Add connection info
-                            iFiber.PinB.ConnectedPins.Add(iFiber.PinA);
-                            iFiber.PinA.ConnectedPins.Add(CurrentPin);
-                            break;
-                        }
+                        iFiber.LaidCount += 1; // Add connection info
+                        iFiber.PinB.ConnectedPins.Add(iFiber.PinA);
+                        iFiber.PinA.ConnectedPins.Add(CurrentPin);
+                        break;
+                        //}
                     }
                 }
             }
