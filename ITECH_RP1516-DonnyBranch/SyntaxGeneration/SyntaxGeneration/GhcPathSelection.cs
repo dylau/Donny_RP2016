@@ -31,6 +31,7 @@ namespace RP1516
             pManager.AddTextParameter("Syntax Note", "Syntax Note", "Syntax Note", GH_ParamAccess.list);
             pManager.AddNumberParameter("Fiber Sorting Indexes", "Fiber Sorting Indexes", "Fiber Sorting Indexes", GH_ParamAccess.list);
             pManager.AddNumberParameter("Missed Fiber Count", "Missed Fiber Count", "Missed Fiber Count", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Sorting Key Value", "Sorting Key Value", "Sorting Key Value", GH_ParamAccess.list);
         }
             
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -114,6 +115,8 @@ namespace RP1516
             DA.SetDataList("Fiber Sorting Indexes", FiberFabricationIndexs);
 
             DA.SetData("Missed Fiber Count", missedFiberCount);
+
+            DA.SetDataList("Sorting Key Value", FiberSyntax.Select(o => o.Curliness).ToList());
         }
 
         protected override System.Drawing.Bitmap Icon

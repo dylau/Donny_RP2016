@@ -18,7 +18,6 @@ namespace RP1516
         public List<double> FiberFabricationIndexNote; // indicate the fabrication order of the sorted fibers, used to check how the syntax is defferent from sorted order
         public double Tolerance;
         public double SyntaxEvaluation; // evaluate how the path selection is contradictory to the curvature
-        public double DuplicateMax = 1; // the maximum amount of fiber a connection can repeat
         public List<Fiber> SortedFibers;
         public double RemoveEdge;
         public double PinCapacity;
@@ -65,7 +64,7 @@ namespace RP1516
             {
                 Fiber iFiber = SortedVisableFibers[i];
 
-                if (iFiber.LaidCount > DuplicateMax) // skip duplicate 
+                if (iFiber.LaidCount >= 1) // skip duplicate 
                 {
                     ;
                     if (i == SortedVisableFibers.Count - 1) // already last visible fiber

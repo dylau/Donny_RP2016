@@ -205,11 +205,11 @@ namespace RP1516
             List<double> SortingKeyValues = new List<double>();
             List<string> FiberTypes = new List<string>();
 
-            NC.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
-            NS.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
-            PS.OrderByDescending(o => o.Curliness).ToList(); // stragiht -> curve
-            PC.OrderByDescending(o => o.Curliness).ToList(); // straight -> curve
-            Mix.OrderBy(o => o.Curliness).ToList(); // straight -> curve
+            NC = NC.OrderByDescending(o => o.Curliness).ToList(); // curve -> stragiht
+            NS = NS.OrderByDescending(o => o.Curliness).ToList(); // curve -> stragiht
+            PS = PS.OrderBy(o => o.Curliness).ToList(); // stragiht -> curve
+            PC = PC.OrderBy(o => o.Curliness).ToList(); // straight -> curve
+            Mix = Mix.OrderBy(o => o.Curliness).ToList(); // straight -> curve
 
             // change fiber sorting ID
             for (int i = 0; i < NC.Count; i++)
