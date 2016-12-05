@@ -27,26 +27,32 @@ namespace RP1516
 
         // sorting keys 
         public double Curliness = 0;
+        public double LengthDifference;
 
         // structure parameter
         public double StructureFactor = 0.0; // bigger factor indicates more important fibers 
 
+        // path selection, maximum duplication
+        public int LaidCount;
 
         public Fiber(Curve fiberCrv, int fiberID, string direction)
         {
-            FiberCrv = fiberCrv.Rebuild(5,5,true);
+            LaidCount = 0;
+
+            FiberCrv = fiberCrv.Rebuild(6,7,true);
             FiberSortingIndex = fiberID;
             Direction = direction;
 
-            DetermineType(); // P or N?
-            CalculateCurliness();
+            LengthDifference = FiberCrv.GetLength() - StraightLine.Length;
 
+            DetermineType(); // P or N or Mix
+            CalculateCurliness();
 
         }
 
         public void DetermineType() 
         {
-            int segment = 6;
+            int segment = 7;
             double increment = 1 / (double)segment;
 
             List<bool> curvatureFlag = new List<bool>();
@@ -56,7 +62,7 @@ namespace RP1516
                 curvatureFlag.Add(FiberCrv.CurvatureAt(increment * i).Z > 0); // if true, Negative
             }
 
-            int tolerance = 1; // allow tolerance points to be different curved 
+            int tolerance = 2; // allow tolerance points to be different curved 
             if (curvatureFlag.Where(o => o == true).Count() >= segment - 1 - tolerance)
                 Type = "Negative";
             else if (curvatureFlag.Where(o => o == false).Count() >= segment - 1 - tolerance)

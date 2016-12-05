@@ -17,7 +17,7 @@ namespace RP1516
         public List<Fiber> VisibleFibers; // potential fibers start with this pin
         public Point3d Position;
         public List<Pin> ConnectedPins; // connected with fiebrs
-        public List<int> ConnectedPinsCount;
+        public List<int> ConnectedPinsCount; // how many fibers for each connection
         public List<Pin> NeighbourPins; // on the same frame, defined by neighbour range
 
         public Pin(Point3d position, Curve frameCrv, string frameID, int index)
@@ -33,21 +33,5 @@ namespace RP1516
             ConnectedPinsCount = new List<int>();
 
         }
-
-        public Pin(Point3d position, string frameID, int index)
-        {
-            Position = position;
-            FrameID = frameID;
-            Index = index;
-            PinID = String.Format("{0}{1}", FrameID, Index);
-            VisibleFibers = new List<Fiber>();
-            ConnectedPins = new List<Pin>();
-            NeighbourPins = new List<Pin>();
-            ConnectedPinsCount = new List<int>();
-
-
-        }
-
-
     }
 }

@@ -33,20 +33,11 @@ namespace RP1516
             
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<Fiber> SortedFibersBigList = new List<Fiber>();
-            DA.GetDataList<Fiber>("Sorted Custom Fibers", SortedFibersBigList);
+            List<Fiber> SortedFibers = new List<Fiber>();
+            DA.GetDataList<Fiber>("Sorted Custom Fibers", SortedFibers);
 
             double pinCapacity = 10.0;
             DA.GetData<double>("Pin Capacity", ref pinCapacity);
-
-            List<Fiber> SortedFibers = new List<Fiber>();
-            SortedFibers = SortedFibersBigList;
-                
-
-            for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
-            {
-                SortedFibers[i].FiberSortingIndex = i;
-            }
 
             // component output
             List<Fiber> FiberSyntax = new List<Fiber>();
@@ -80,29 +71,34 @@ namespace RP1516
                 PathAgent.SearchFiber(); // currentFiber & currentPin(may go to its neighbours) are changed 
                 // !!!
 
-                if (PathAgent.CurrentPin.FrameID == "A")
+                if (PathAgent.FiberSearchFlag)
                 {
-                    PathAgent.CurrentFiber.Direction = "AB";
-                    PathAgent.CurrentFiber.StartPinID = PathAgent.CurrentFiber.PinA.PinID;
-                    PathAgent.CurrentFiber.EndPinID = PathAgent.CurrentFiber.PinB.PinID;
+                    if (PathAgent.CurrentPin.FrameID == "A")
+                    {
+                        PathAgent.CurrentFiber.Direction = "AB";
+                        PathAgent.CurrentFiber.StartPinID = PathAgent.CurrentFiber.PinA.PinID;
+                        PathAgent.CurrentFiber.EndPinID = PathAgent.CurrentFiber.PinB.PinID;
 
-                    //PathAgent.CurrentFiber.StartPin = PathAgent.CurrentFiber.PinA;
-                    //PathAgent.CurrentFiber.EndPin = PathAgent.CurrentFiber.PinB;
+                        //PathAgent.CurrentFiber.StartPin = PathAgent.CurrentFiber.PinA;
+                        //PathAgent.CurrentFiber.EndPin = PathAgent.CurrentFiber.PinB;
 
+                    }
+
+                    else
+                    {
+                        PathAgent.CurrentFiber.Direction = "BA";
+                        PathAgent.CurrentFiber.StartPinID = PathAgent.CurrentFiber.PinB.PinID;
+                        PathAgent.CurrentFiber.EndPinID = PathAgent.CurrentFiber.PinA.PinID;
+
+                        //PathAgent.CurrentFiber.StartPin = PathAgent.CurrentFiber.PinB;
+                        //PathAgent.CurrentFiber.EndPin = PathAgent.CurrentFiber.PinA;
+                    }
+                    PathAgent.MarkDownCurrentPin(); // because the current pin can go to its neighbours, mark down again
+                    FiberSyntax.Add(PathAgent.CurrentFiber);
                 }
 
                 else
-                {
-                    PathAgent.CurrentFiber.Direction = "BA";
-                    PathAgent.CurrentFiber.StartPinID = PathAgent.CurrentFiber.PinB.PinID;
-                    PathAgent.CurrentFiber.EndPinID = PathAgent.CurrentFiber.PinA.PinID;
-
-                    //PathAgent.CurrentFiber.StartPin = PathAgent.CurrentFiber.PinB;
-                    //PathAgent.CurrentFiber.EndPin = PathAgent.CurrentFiber.PinA;
-                }
-
-                PathAgent.MarkDownCurrentPin(); // because the current pin can go to its neighbours, mark down again
-                FiberSyntax.Add(PathAgent.CurrentFiber);
+                    break;
 
             }
             List<Curve> ContinousFiberCrv = new List<Curve>();

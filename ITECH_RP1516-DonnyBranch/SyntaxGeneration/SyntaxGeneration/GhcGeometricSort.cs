@@ -77,7 +77,6 @@ namespace RP1516
             double den_Mix = 0.5;
             DA.GetData("density Mix", ref den_Mix);
 
-
             // ------------------------------- N/P dispatch ---------------------------------
             List<Fiber> NC_all = new List<Fiber>();
             List<Fiber> NS_all = new List<Fiber>();
@@ -206,27 +205,25 @@ namespace RP1516
             List<double> SortingKeyValues = new List<double>();
             List<string> FiberTypes = new List<string>();
 
-            #region: Curliness
             NC.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
             NS.OrderBy(o => o.Curliness).ToList(); // curve -> stragiht
             PS.OrderByDescending(o => o.Curliness).ToList(); // stragiht -> curve
-            PC.OrderByDescending(o => o.Curliness).ToList(); // straight ->curve
+            PC.OrderByDescending(o => o.Curliness).ToList(); // straight -> curve
+            Mix.OrderBy(o => o.Curliness).ToList(); // sttaight -> curve
 
-
-
-
-
-            //for (int i = 0; i < SortedFibers.Count; i++) // change fiber sorting ID
-            //{
-            //    SortedFibers[i].FiberSortingIndex = i;
-            //}
-
-            //SortedFiberCrvs = SortedFibers.Select(o => o.FiberCrv).ToList();
-            //SortingKeyValues = SortedFibers.Select(o => o.MaximumDistance).ToList();
-
-            #endregion
-
-            // ===================================================================
+            // change fiber sorting ID
+            for (int i = 0; i < NC.Count; i++)
+                NC[i].FiberSortingIndex = i;
+            for (int i = 0; i < NS.Count; i++) 
+                NS[i].FiberSortingIndex = i;
+            for (int i = 0; i < PS.Count; i++) 
+                PS[i].FiberSortingIndex = i;
+            for (int i = 0; i < PC.Count; i++) 
+                PC[i].FiberSortingIndex = i;
+            for (int i = 0; i < Mix.Count; i++) 
+                Mix[i].FiberSortingIndex = i;
+            
+            // -------------------------------------------- Output --------------------------------------------
             DA.SetDataList("N", NegativeFibers.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("P", PositiveFibers.Select(o => o.FiberCrv).ToList());
 
