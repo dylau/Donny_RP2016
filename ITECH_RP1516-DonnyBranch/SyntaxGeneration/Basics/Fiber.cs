@@ -43,6 +43,7 @@ namespace RP1516
             FiberSortingIndex = fiberID;
             Direction = direction;
 
+            StraightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
             LengthDifference = FiberCrv.GetLength() - StraightLine.Length;
 
             DetermineType(); // P or N or Mix
@@ -74,8 +75,7 @@ namespace RP1516
 
         public void CalculateCurliness()
         {
-            Line straightLine = new Line(FiberCrv.PointAtStart, FiberCrv.PointAtEnd);
-            StraightLine = straightLine;
+
 
             int Segment = 10;
             PtsOnCurve = Utils.PublicatePointsOnCurve(FiberCrv, Segment);

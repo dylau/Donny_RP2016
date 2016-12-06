@@ -53,6 +53,7 @@ namespace RP1516
             pManager.AddGenericParameter("Mix*", "Mix*", "Mix*", GH_ParamAccess.list);
             pManager.AddCurveParameter("Mix_skip", "Mix_skip", "skipped Mix", GH_ParamAccess.list);
 
+            pManager.AddNumberParameter("Info", "Info", "Info", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -222,7 +223,20 @@ namespace RP1516
                 PC[i].FiberSortingIndex = i;
             for (int i = 0; i < Mix.Count; i++) 
                 Mix[i].FiberSortingIndex = i;
-            
+
+            // length difference average, for indication of tension
+            double NC_info = NC.Select(o => o.LengthDifference).ToList().Average();
+            double NS_info = NS.Select(o => o.LengthDifference).ToList().Average();
+            double PS_info = PS.Select(o => o.LengthDifference).ToList().Average();
+            double PC_info = PC.Select(o => o.LengthDifference).ToList().Average();
+            double Mix_info = Mix.Select(o => o.LengthDifference).ToList().Average();
+            List<double> Info = new List<double>();
+            Info.Add(NC_info);
+            Info.Add(NS_info);
+            Info.Add(PS_info);
+            Info.Add(PC_info);
+            Info.Add(Mix_info);
+
             // -------------------------------------------- Output --------------------------------------------
             DA.SetDataList("N", NegativeFibers.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("P", PositiveFibers.Select(o => o.FiberCrv).ToList());
@@ -246,6 +260,8 @@ namespace RP1516
             DA.SetDataList("Mix", Mix.Select(o => o.FiberCrv).ToList());
             DA.SetDataList("Mix*", Mix);
             DA.SetDataList("Mix_skip", Mix_skip.Select(o => o.FiberCrv).ToList());
+
+            DA.SetDataList("Info", Info);
         }
 
         protected override System.Drawing.Bitmap Icon
