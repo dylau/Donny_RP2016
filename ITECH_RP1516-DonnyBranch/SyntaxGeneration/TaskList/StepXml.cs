@@ -77,11 +77,13 @@ namespace RP1516
                 OperationSide = "B";
 
                 XmlAttribute PinStart = xmlDoc.CreateAttribute("pinStart");
-                PinStart.Value = StepCurve.PinA.PinID;
+                PinStart.Value = string.Format("{0}, {1}", StepCurve.PinA.SelectedNeighbourPin.PinID, StepCurve.PinA.PinID);
+                
                 stepNode.Attributes.Append(PinStart);
 
                 XmlAttribute PinEnd = xmlDoc.CreateAttribute("pinEnd");
-                PinEnd.Value = StepCurve.PinB.PinID;
+                PinEnd.Value = string.Format("{0}, {1}", StepCurve.PinB.PinID, StepCurve.PinB.SelectedNeighbourPin.PinID);
+
                 stepNode.Attributes.Append(PinEnd);
 
                 Wind_pin.Value = string.Format("W_{0}", StepCurve.PinB.Index.ToString());
@@ -93,11 +95,13 @@ namespace RP1516
                 OperationSide = "A";
 
                 XmlAttribute PinStart = xmlDoc.CreateAttribute("pinStart");
-                PinStart.Value = StepCurve.PinB.PinID;
+                PinStart.Value = string.Format("{0}, {1}", StepCurve.PinB.SelectedNeighbourPin.PinID, StepCurve.PinB.PinID);
+
                 stepNode.Attributes.Append(PinStart);
 
                 XmlAttribute PinEnd = xmlDoc.CreateAttribute("pinEnd");
-                PinEnd.Value = StepCurve.PinA.PinID;
+                PinEnd.Value = string.Format("{0}, {1}", StepCurve.PinA.PinID, StepCurve.PinA.SelectedNeighbourPin.PinID);
+
                 stepNode.Attributes.Append(PinEnd);
 
                 Wind_pin.Value = string.Format("W_{0}", StepCurve.PinA.Index.ToString());

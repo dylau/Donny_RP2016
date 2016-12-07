@@ -32,8 +32,10 @@ namespace RP1516
         // structure parameter
         public double StructureFactor = 0.0; // bigger factor indicates more important fibers 
 
-        // path selection, maximum duplication
+        // path selection, maximum duplication, do not allow duplicate now
         public int LaidCount;
+
+
 
         public Fiber(Curve fiberCrv, int fiberID, string direction)
         {

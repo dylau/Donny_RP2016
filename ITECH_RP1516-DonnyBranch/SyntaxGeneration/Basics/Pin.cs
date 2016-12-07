@@ -19,6 +19,8 @@ namespace RP1516
         public List<Pin> ConnectedPins; // connected with fiebrs
         public List<int> ConnectedPinsCount; // how many fibers for each connection
         public List<Pin> NeighbourPins; // on the same frame, defined by neighbour range
+        public Pin SelectedNeighbourPin;
+
 
         public Pin(Point3d position, Curve frameCrv, string frameID, int index)
         {
@@ -31,7 +33,7 @@ namespace RP1516
             ConnectedPins = new List<Pin>();
             NeighbourPins = new List<Pin>();
             ConnectedPinsCount = new List<int>();
-
+            SelectedNeighbourPin = this; // defaul setting the neighbour is itself
         }
     }
 }

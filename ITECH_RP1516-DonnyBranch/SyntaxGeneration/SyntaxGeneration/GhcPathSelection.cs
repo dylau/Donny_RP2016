@@ -63,6 +63,7 @@ namespace RP1516
 
                 PathAgent.GoToTheOtherPin(); // currentPin is changed according to current fiber
                 PathAgent.MarkDownCurrentPin();
+
                 // updated fiber
 
                 // !!!
@@ -77,6 +78,7 @@ namespace RP1516
                         PathAgent.CurrentFiber.StartPinID = PathAgent.CurrentFiber.PinA.PinID;
                         PathAgent.CurrentFiber.EndPinID = PathAgent.CurrentFiber.PinB.PinID;
 
+
                     }
 
                     else
@@ -86,7 +88,9 @@ namespace RP1516
                         PathAgent.CurrentFiber.EndPinID = PathAgent.CurrentFiber.PinA.PinID;
 
                     }
+
                     PathAgent.MarkDownCurrentPin(); // because the current pin can go to its neighbours, mark down again
+
                     FiberSyntax.Add(PathAgent.CurrentFiber);
                 }
 

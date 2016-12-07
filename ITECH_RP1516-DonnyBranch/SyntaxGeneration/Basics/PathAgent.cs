@@ -73,36 +73,42 @@ namespace RP1516
                         ;
                 }
 
-                else
+                else // this is the fiber we are looking for!
                 {
-                    if (CurrentPin.FrameID == "A")
+                    if (CurrentPin.FrameID == "A") // this fiber is from A-B
                     {
-                        CurrentPin = iFiber.PinA; // update current pin to its neighbour/itself on same frame
+                        iFiber.Direction = "AB";
+
+                        // neighbour
+                        CurrentPin.SelectedNeighbourPin = iFiber.PinA;
+                        iFiber.PinA.SelectedNeighbourPin = CurrentPin;
+
+                        CurrentPin = iFiber.PinA; // update current pin to its neighbour/itself on SAME frame
 
                         FiberSearchFlag = true;
 
                         CurrentFiber = iFiber;
                         FiberFabricationIndexNote.Add(iFiber.FiberSortingIndex);
 
-                        iFiber.LaidCount += 1; // Add connection info
+                        iFiber.LaidCount += 1; // Add connection info 
+
                         iFiber.PinA.ConnectedPins.Add(iFiber.PinB);
                         iFiber.PinB.ConnectedPins.Add(CurrentPin);
+
                         break;
-                        //}
+                        
                     }
 
-                    if (CurrentPin.FrameID == "B")
+                    if (CurrentPin.FrameID == "B") // this fiber is from B-A
                     {
-                        CurrentPin = iFiber.PinB;
-                        // constrains
-                        // 1. skip fiber already laid
-                        //List<int> connectedPinIDs = CurrentPin.ConnectedPins.Select(o => o.Index).ToList();
-                        //if (connectedPinIDs.Exists(o => o == iFiber.PinA.Index)) // the nearest fiber is alrealdy laid, go to next near fiber, no duplication is allowed
-                        //    FiberSearchFlag = false;
+                        iFiber.Direction = "BA";
 
-                        // all constrains are saticfied
-                        //else
-                        //{
+                        // neighbour
+                        CurrentPin.SelectedNeighbourPin = iFiber.PinB;
+                        iFiber.PinB.SelectedNeighbourPin = CurrentPin;
+
+                        CurrentPin = iFiber.PinB;
+
                         FiberSearchFlag = true;
 
                         CurrentFiber = iFiber;
