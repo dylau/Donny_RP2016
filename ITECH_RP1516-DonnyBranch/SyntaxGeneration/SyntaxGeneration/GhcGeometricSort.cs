@@ -233,8 +233,8 @@ namespace RP1516
             List<double> Info = new List<double>();
             Info.Add(NC_info);
             Info.Add(NS_info);
-            Info.Add(PS_info);
             Info.Add(PC_info);
+            Info.Add(PS_info);
             Info.Add(Mix_info);
 
             // -------------------------------------------- Output --------------------------------------------
