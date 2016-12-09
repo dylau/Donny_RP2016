@@ -25,12 +25,16 @@ namespace RP1516
             pManager.AddPointParameter("Pins on Frame B", "Pins on Frame B", "Pins on Frame B", GH_ParamAccess.list);
             pManager.AddNumberParameter("Neighbour Range", "Neighbour Range", "Neighbour Range", GH_ParamAccess.item); // search for adequate fibers within the neighbours of one pin to generate better curvature
             pManager.AddTextParameter("Fiber Generation Type", "Fiber Generation Type", "Fiber Generation Type", GH_ParamAccess.item);
+
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("All Fibers", "All Fibers", "All Fibers", GH_ParamAccess.list);
             pManager.AddCurveParameter("All Fiber Curves", "All Fiber Curves", "All Fiber Curves", GH_ParamAccess.list);
+            //pManager.AddGenericParameter("Pins on frame A", "Pins on frame A", "Pins on frame A", GH_ParamAccess.list);
+            //pManager.AddGenericParameter("Pins on frame B", "Pins on frame B", "Pins on frame B", GH_ParamAccess.list);
+
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -47,9 +51,10 @@ namespace RP1516
             List<Point3d> pointsB = new List<Point3d>();
             DA.GetDataList<Point3d>("Pins on Frame A", pointsA);
             DA.GetDataList<Point3d>("Pins on Frame B", pointsB);
-            //sort points according to y coordinate before use them to initialize pins
-            pointsA.OrderBy(o => o.Y).ToList();
-            pointsB.OrderBy(o => o.Y).ToList();
+
+            //sort points according to x coordinate before use them to initialize pins
+            pointsA.OrderByDescending(o => o.X).ToList();
+            pointsB.OrderByDescending(o => o.X).ToList();
 
             double neighbourRange = 0.0;
             DA.GetData<double>("Neighbour Range", ref neighbourRange);
@@ -121,6 +126,10 @@ namespace RP1516
             List<Curve> AllFiberCurves = new List<Curve>();
             AllFiberCurves = AllPossibleFibers.Select(o => o.FiberCrv).ToList();
             DA.SetDataList("All Fiber Curves", AllFiberCurves);
+
+            //DA.SetDataList("Pins on frame A", PinsA);
+            //DA.SetDataList("Pins on frame B", PinsB);
+
         }
 
 

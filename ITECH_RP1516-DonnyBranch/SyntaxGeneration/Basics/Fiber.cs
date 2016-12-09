@@ -41,7 +41,7 @@ namespace RP1516
         {
             LaidCount = 0;
 
-            FiberCrv = fiberCrv.Rebuild(6,7,true);
+            FiberCrv = fiberCrv.Rebuild(4,5,true);
             FiberSortingIndex = fiberID;
             Direction = direction;
 

@@ -32,6 +32,7 @@ namespace RP1516
             pManager.AddNumberParameter("Fiber Sorting Indexes", "Fiber Sorting Indexes", "Fiber Sorting Indexes", GH_ParamAccess.list);
             pManager.AddNumberParameter("Missed Fiber Count", "Missed Fiber Count", "Missed Fiber Count", GH_ParamAccess.item);
             pManager.AddNumberParameter("Sorting Key Value", "Sorting Key Value", "Sorting Key Value", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Length Difference", "Length Difference", "Length Difference", GH_ParamAccess.list);
         }
             
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -100,7 +101,6 @@ namespace RP1516
                     break;
                 }
                
-
             }
             List<Curve> ContinousFiberCrv = new List<Curve>();
             ContinousFiberCrv = FiberSyntax.Select(o => o.FiberCrv).ToList();
@@ -121,6 +121,9 @@ namespace RP1516
             DA.SetData("Missed Fiber Count", missedFiberCount);
 
             DA.SetDataList("Sorting Key Value", FiberSyntax.Select(o => o.Curliness).ToList());
+
+            DA.SetDataList("Length Difference", FiberSyntax.Select(o => o.LengthDifference).ToList());
+
         }
 
         protected override System.Drawing.Bitmap Icon

@@ -18,13 +18,18 @@ namespace RP1516
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("All Fibers", "All Fibers", "All Fibers", GH_ParamAccess.list);
-            pManager.AddNumberParameter("negative threshold", "bigger meaning less NC, more NS", "bigger meaning less NC, more NS", GH_ParamAccess.item);
-            pManager.AddNumberParameter("positive threshold", "bigger meaning less PC, more PS", "bigger meaning less PC, more PS", GH_ParamAccess.item);
+            pManager.AddNumberParameter("negative threshold", "negative threshold", "bigger meaning less NC, more NS", GH_ParamAccess.item);
+            pManager.AddNumberParameter("positive threshold", "positive threshold", "bigger meaning less PC, more PS", GH_ParamAccess.item);
             pManager.AddNumberParameter("density NC", "density NC", "density NC", GH_ParamAccess.item);
             pManager.AddNumberParameter("density NS", "density NS", "density NS", GH_ParamAccess.item);
             pManager.AddNumberParameter("density PC", "density PC", "density PC", GH_ParamAccess.item);
             pManager.AddNumberParameter("density PS", "density PS", "density PS", GH_ParamAccess.item);
-            pManager.AddNumberParameter("density Mix", "density Mix", "density Mix", GH_ParamAccess.item); 
+            pManager.AddNumberParameter("density Mix", "density Mix", "density Mix", GH_ParamAccess.item);
+
+            //pManager.AddGenericParameter("pins on frame A", "pins on frame A", "pins on frame A", GH_ParamAccess.list);
+            //pManager.AddGenericParameter("pins on frame B", "pins on frame B", "pins on frame B", GH_ParamAccess.list);
+
+
 
         }
 
@@ -53,7 +58,9 @@ namespace RP1516
             pManager.AddGenericParameter("Mix*", "Mix*", "Mix*", GH_ParamAccess.list);
             pManager.AddCurveParameter("Mix_skip", "Mix_skip", "skipped Mix", GH_ParamAccess.list);
 
-            pManager.AddNumberParameter("Info", "Info", "Info", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Pin load frame A", "Pin load frame A", "Pin load frame A", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Pin load frame B", "Pin load frame B", "Pin load frame B", GH_ParamAccess.list);
+
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -77,6 +84,11 @@ namespace RP1516
             DA.GetData("density PS", ref den_PS);
             double den_Mix = 0.5;
             DA.GetData("density Mix", ref den_Mix);
+
+
+            //DA.GetDataList("pins on frame A", PinsA);
+            //DA.GetDataList("pins on frame A", PinsB);
+
 
             // ------------------------------- N/P dispatch ---------------------------------
             //List<Fiber> NC_all = new List<Fiber>();
@@ -144,6 +156,9 @@ namespace RP1516
             for (int i = 0; i < (int)( (double)NC_all.Count / (double)groupCount_NC ); i = i + groupCount_NC)
             {
                 NC.Add(NC_all[ i * groupCount_NC ]);
+                NC_all[i * groupCount_NC].PinA.PinLoad += 1;
+                NC_all[i * groupCount_NC].PinB.PinLoad += 1;
+
                 for (int j = 1; j < groupCount_NC; j++)
                 {
                     NC_skip.Add(NC_all[ i * groupCount_NC + j ]);
@@ -156,6 +171,9 @@ namespace RP1516
             for (int i = 0; i < (int)((double)NS_all.Count / (double)groupCount_NS); i = i + groupCount_NS)
             {
                 NS.Add(NS_all[i * groupCount_NS]);
+                NS_all[i * groupCount_NS].PinA.PinLoad += 1;
+                NS_all[i * groupCount_NS].PinB.PinLoad += 1;
+
                 for (int j = 1; j < groupCount_NS; j++)
                 {
                     NS_skip.Add(NS_all[i * groupCount_NS + j]);
@@ -168,6 +186,9 @@ namespace RP1516
             for (int i = 0; i < (int)((double)PC_all.Count / (double)groupCount_PC); i = i + groupCount_PC)
             {
                 PC.Add(PC_all[i * groupCount_PC]);
+                PC_all[i * groupCount_PC].PinA.PinLoad += 1;
+                PC_all[i * groupCount_PC].PinB.PinLoad += 1;
+
                 for (int j = 1; j < groupCount_PC; j++)
                 {
                     PC_skip.Add(PC_all[i * groupCount_PC + j]);
@@ -180,6 +201,9 @@ namespace RP1516
             for (int i = 0; i < (int)((double)PS_all.Count / (double)groupCount_PS); i = i + groupCount_PS)
             {
                 PS.Add(PS_all[i * groupCount_PS]);
+                PS_all[i * groupCount_PS].PinA.PinLoad += 1;
+                PS_all[i * groupCount_PS].PinB.PinLoad += 1;
+
                 for (int j = 1; j < groupCount_PS; j++)
                 {
                     PS_skip.Add(PS_all[i * groupCount_PS + j]);
@@ -192,12 +216,14 @@ namespace RP1516
             for (int i = 0; i < (int)((double)MixFibers_all.Count / (double)groupCount_Mix); i = i + groupCount_Mix)
             {
                 Mix.Add(MixFibers_all[i * groupCount_Mix]);
+                MixFibers_all[i * groupCount_Mix].PinA.PinLoad += 1;
+                MixFibers_all[i * groupCount_Mix].PinB.PinLoad += 1;
+
                 for (int j = 1; j < groupCount_Mix; j++)
                 {
                     Mix_skip.Add(MixFibers_all[i * groupCount_Mix + j]);
                 }
             }
-
 
             // -------------------------------------------- Sorting --------------------------------------------
             // output parameters
@@ -225,17 +251,33 @@ namespace RP1516
                 Mix[i].FiberSortingIndex = i;
 
             // length difference average, for indication of tension
-            double NC_info = NC.Select(o => o.LengthDifference).ToList().Average();
-            double NS_info = NS.Select(o => o.LengthDifference).ToList().Average();
-            double PS_info = PS.Select(o => o.LengthDifference).ToList().Average();
-            double PC_info = PC.Select(o => o.LengthDifference).ToList().Average();
-            double Mix_info = Mix.Select(o => o.LengthDifference).ToList().Average();
-            List<double> Info = new List<double>();
-            Info.Add(NC_info);
-            Info.Add(NS_info);
-            Info.Add(PC_info);
-            Info.Add(PS_info);
-            Info.Add(Mix_info);
+            List<double> NC_info = NC.Select(o => o.LengthDifference).ToList();
+            List<double> NS_info = NS.Select(o => o.LengthDifference).ToList();
+            List<double> PS_info = PS.Select(o => o.LengthDifference).ToList();
+            List<double> PC_info = PC.Select(o => o.LengthDifference).ToList();
+            List<double> Mix_info = Mix.Select(o => o.LengthDifference).ToList();
+
+            // pin load
+            List<Fiber> FiberBigList = new List<Fiber>();
+            List<int> PinLoad_A = null;
+            List<int> PinLoad_B = null;
+
+            List<Pin> PinsA = new List<Pin>();
+            List<Pin> PinsB = new List<Pin>();
+
+            FiberBigList = NC.Concat(NS).Concat(PC).Concat(PS).Concat(Mix).ToList();
+
+            foreach (Fiber f in FiberBigList)
+            {
+                PinsA.Add(f.PinA);
+                PinsB.Add(f.PinB);
+            }
+
+            PinsA = PinsA.GroupBy(o => o.PinID).Select(q => q.First()).OrderByDescending(j => j.Position.X).ToList();
+            PinsB = PinsB.GroupBy(o => o.PinID).Select(q => q.First()).OrderByDescending(j => j.Position.X).ToList();
+
+            PinLoad_A = PinsA.Select(o => o.PinLoad).ToList();
+            PinLoad_B = PinsB.Select(o => o.PinLoad).ToList();
 
             // -------------------------------------------- Output --------------------------------------------
             DA.SetDataList("N", NegativeFibers.Select(o => o.FiberCrv).ToList());
@@ -261,14 +303,15 @@ namespace RP1516
             DA.SetDataList("Mix*", Mix);
             DA.SetDataList("Mix_skip", Mix_skip.Select(o => o.FiberCrv).ToList());
 
-            DA.SetDataList("Info", Info);
+            DA.SetDataList("Pin load frame A", PinLoad_A);
+            DA.SetDataList("Pin load frame B", PinLoad_B);
+
         }
 
         protected override System.Drawing.Bitmap Icon
         {
             get
             {
-
                 return null;
             }
         }

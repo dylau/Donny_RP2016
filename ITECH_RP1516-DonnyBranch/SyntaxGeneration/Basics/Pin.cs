@@ -20,7 +20,7 @@ namespace RP1516
         public List<int> ConnectedPinsCount; // how many fibers for each connection
         public List<Pin> NeighbourPins; // on the same frame, defined by neighbour range
         public Pin SelectedNeighbourPin;
-
+        public int PinLoad = 0;
 
         public Pin(Point3d position, Curve frameCrv, string frameID, int index)
         {
